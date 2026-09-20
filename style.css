@@ -17,12 +17,12 @@
 
 body {
     background-color: #0b0f19; display: flex; justify-content: center;
-    min-height: 100vh; color: var(--text-light);
+    height: 100vh; height: 100dvh; color: var(--text-light); overflow: hidden;
 }
 
 #app-container {
     background-color: var(--bg-dark); width: 100%; max-width: 414px;
-    min-height: 100vh; display: flex; flex-direction: column;
+    height: 100vh; height: 100dvh; display: flex; flex-direction: column;
     position: relative; overflow-x: hidden; box-shadow: 0 0 30px rgba(0,0,0,0.5);
 }
 
@@ -65,7 +65,7 @@ body {
 .stat { display: flex; align-items: center; gap: 4px; }
 
 /* Screens */
-.screen { flex: 1; display: flex; flex-direction: column; padding: 1rem; overflow-y: auto; }
+.screen { flex: 1; display: flex; flex-direction: column; padding: 1rem; padding-bottom: 2.5rem; overflow-y: auto; }
 
 /* ANIMAL SELECT & OPERATION SELECT */
 .animal-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 2rem; }
