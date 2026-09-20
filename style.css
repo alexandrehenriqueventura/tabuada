@@ -95,6 +95,13 @@ body {
 .map-node.boss { border-radius: 20px; width: 80px; background-color: var(--gray-dark); color: rgba(255,255,255,0.3); }
 
 /* TELA DE JOGO NORMAL */
+.game-top-bar { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 15px; margin-bottom: 2rem; }
+.quit-btn { background: transparent; border: none; color: var(--gray-light); font-size: 1.5rem; cursor: pointer; }
+.progress-bar-container { flex: 1; }
+.hearts-display { font-size: 1.2rem; font-weight: 800; display: flex; align-items: center; gap: 5px; }
+
+.level-badge { background: rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 20px; font-weight: 800; font-size: 0.9rem; color: var(--secondary); margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; border: 1px solid rgba(255,255,255,0.1); }
+
 .game-header { display: flex; flex-direction: column; align-items: center; margin-bottom: 1rem; width: 100%; position: relative;}
 .game-header h3 { margin: 0; }
 .close-btn { position: absolute; right: 0; top: 0; background: transparent; border: none; color: var(--gray-light); font-size: 1.5rem; cursor: pointer; padding: 5px; }

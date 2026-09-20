@@ -162,6 +162,27 @@ let bossTimeLeft = 0;
 let bossTimerInterval = null;
 let bossLives = 3;
 
+// Web Audio API Sound System
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+const sfx = {
+    play: (freq, type, dur, vol=0.1) => {
+        if(audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type; osc.frequency.value = freq;
+        gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + dur);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(); osc.stop(audioCtx.currentTime + dur);
+    },
+    correct: () => { sfx.play(440, 'sine', 0.1); setTimeout(() => sfx.play(659, 'sine', 0.2), 100); },
+    wrong: () => { sfx.play(250, 'sawtooth', 0.2); setTimeout(() => sfx.play(200, 'sawtooth', 0.3), 150); },
+    bossHit: () => { sfx.play(150, 'square', 0.1, 0.2); setTimeout(() => sfx.play(100, 'square', 0.2, 0.2), 50); },
+    bossHeal: () => { sfx.play(400, 'sine', 0.2); setTimeout(() => sfx.play(600, 'sine', 0.3), 100); },
+    win: () => { [523, 659, 783, 1046].forEach((f, i) => setTimeout(() => sfx.play(f, 'square', 0.2), i*150)); },
+    click: () => { sfx.play(600, 'sine', 0.05, 0.05); }
+};
+
 // ==========================================
 // NAVEGAÇÃO E UI GERAL
 // ==========================================
@@ -268,6 +289,11 @@ function renderMap() {
     }, 100);
 }
 
+document.getElementById('btn-quit-game').addEventListener('click', () => {
+    sfx.click();
+    showScreen(screenMap);
+});
+
 // ==========================================
 // LÓGICA DO JOGO NORMAL
 // ==========================================
@@ -283,13 +309,15 @@ function startLevel(levelData) {
     activeLevelData = levelData;
     currentPhaseScore = 0;
     
-    if (levelData.type === 'boss') {
-        startBossLevel();
-    } else {
+    if (levelData.type === 'normal') {
         currentPhaseTarget = levelData.targetScore;
         progressFill.style.width = '0%';
+        document.getElementById('level-title').textContent = levelData.title;
+        document.getElementById('game-lives-count').textContent = gameState.lives;
         generateNormalQuestion();
         showScreen(screenGame, false);
+    } else {
+        startBossLevel();
     }
 }
 
@@ -382,12 +410,14 @@ function submitNormalAnswer() {
     if (currentInputValue === "") return;
     const op = activeLevelData.op || '*';
     if (parseInt(currentInputValue) === currentExpectedAnswer) {
+        sfx.correct();
         registerAnswer(parseInt(num1El.textContent), parseInt(num2El.textContent), op, true);
         currentPhaseScore++;
         progressFill.style.width = `${(currentPhaseScore / currentPhaseTarget) * 100}%`;
         if (currentPhaseScore >= currentPhaseTarget) { winLevel(); return; }
         generateNormalQuestion();
     } else {
+        sfx.wrong();
         registerAnswer(parseInt(num1El.textContent), parseInt(num2El.textContent), op, false);
         loseLife();
         currentInputValue = ""; updateNormalDisplay();
@@ -396,13 +426,17 @@ function submitNormalAnswer() {
 
 function loseLife() {
     gameState.lives--;
-    saveProgress();
+    gameState.streak = 0; // Perde ofensiva
     updateGlobalUI();
-    document.body.style.backgroundColor = '#ef4444';
-    setTimeout(() => { document.body.style.backgroundColor = '#0b0f19'; }, 300);
+    document.getElementById('game-lives-count').textContent = gameState.lives;
+    
+    // Mostra feedback visual
+    feedbackEl.textContent = "Errou!";
+    feedbackEl.style.color = "var(--danger)";
+    setTimeout(() => { feedbackEl.textContent = ""; }, 1000);
     
     if (gameState.lives <= 0) {
-        document.getElementById('lose-reason').textContent = "Você ficou sem energia.";
+        document.getElementById('lose-reason').textContent = "Você ficou sem vidas. Volte amanhã para tentar novamente.";
         showScreen(screenLose, false);
     }
 }
@@ -486,6 +520,7 @@ bKeyEnter.addEventListener('click', () => {
 
     const op = activeLevelData.op || '*';
     if (parseInt(currentInputValue) === currentExpectedAnswer) {
+        sfx.bossHit();
         registerAnswer(parseInt(bNum1.textContent), parseInt(bNum2.textContent), op, true);
         bossIcon.classList.add('boss-anim-hit');
         currentPhaseScore++;
@@ -497,6 +532,7 @@ bKeyEnter.addEventListener('click', () => {
         }
         generateBossQuestion();
     } else {
+        sfx.bossHeal();
         registerAnswer(parseInt(bNum1.textContent), parseInt(bNum2.textContent), op, false);
         bossIcon.classList.add('boss-anim-heal');
         currentPhaseScore = Math.max(0, currentPhaseScore - 1);
@@ -541,6 +577,7 @@ function updateBossHearts() {
 // RESULTADOS
 // ==========================================
 function winLevel() {
+    sfx.win();
     if (activeLevelData.id === gameState.maxLevelReached) {
         gameState.maxLevelReached++;
         gameState.streak++; // Ganha ofensiva

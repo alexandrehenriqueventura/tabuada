@@ -122,14 +122,20 @@
 
         <!-- TELA 2: Jogo Normal -->
         <section id="screen-game" class="screen hidden">
-            <div class="game-header">
-                <h3 id="level-title">Treino</h3>
-                <div class="progress-bar">
-                    <div id="progress-fill" style="width: 0%;"></div>
+            <div class="game-top-bar">
+                <button class="quit-btn" id="btn-quit-game"><i class="fa-solid fa-xmark"></i></button>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" style="margin-top: 0;">
+                        <div id="progress-fill" style="width: 0%;"></div>
+                    </div>
                 </div>
+                <div class="hearts-display"><i class="fa-solid fa-heart text-red"></i> <span id="game-lives-count">3</span></div>
             </div>
 
             <div class="game-content">
+                <div class="level-badge" id="level-title-badge">
+                    <i class="fa-solid fa-dumbbell"></i> <span id="level-title">Treino Prático</span>
+                </div>
                 <div class="combo-text hidden" id="combo-display">COMBO <span id="combo-count">2</span></div>
                 <div class="question-container">
                     <span id="num1">0</span> 
