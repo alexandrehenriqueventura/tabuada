@@ -67,6 +67,17 @@ body {
 /* Screens */
 .screen { flex: 1; display: flex; flex-direction: column; padding: 1rem; overflow-y: auto; }
 
+/* ANIMAL SELECT & OPERATION SELECT */
+.animal-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 2rem; }
+.animal-option { background: var(--bg-card); border: 3px solid transparent; border-radius: 20px; aspect-ratio: 1; display: flex; justify-content: center; align-items: center; font-size: 4rem; color: var(--success); cursor: pointer; transition: transform 0.2s; }
+.animal-option.selected { border-color: var(--text-light); transform: scale(1.05); background: var(--gray-dark); box-shadow: 0 0 20px var(--success); }
+
+.operation-cards { display: flex; flex-direction: column; gap: 12px; margin-top: 1rem; }
+.op-card { background: var(--bg-card); padding: 1.2rem; border-radius: 16px; display: flex; align-items: center; gap: 15px; font-size: 1.3rem; font-weight: 800; cursor: pointer; transition: transform 0.1s; box-shadow: 0 4px 0 var(--gray-dark); }
+.op-card:active { transform: translateY(4px); box-shadow: none; }
+.op-card i { font-size: 1.8rem; width: 40px; text-align: center; }
+.op-card.mixed-card { background: linear-gradient(45deg, var(--bg-card), var(--gray-dark)); border: 2px dashed var(--purple); }
+
 /* Mapa */
 .phase-card {
     background-color: var(--bg-card); border-radius: 20px; padding: 1.5rem;

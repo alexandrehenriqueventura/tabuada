@@ -1,5 +1,7 @@
 // Telas
 const screenLogin = document.getElementById('screen-login');
+const screenAnimalSelect = document.getElementById('screen-animal-select');
+const screenOperationSelect = document.getElementById('screen-operation-select');
 const screenMap = document.getElementById('screen-map');
 const screenGame = document.getElementById('screen-game');
 const screenBoss = document.getElementById('screen-boss');
@@ -60,14 +62,16 @@ const btnBackMapLose = document.getElementById('btn-back-map-lose');
 // ==========================================
 let currentUser = "";
 let isNewUser = false;
+let currentMode = "+"; // +, -, *, /, mixed
 let gameState = {
     lives: 3,
     gems: 0,
     streak: 0,
-    maxLevelReached: 1,
+    maxLevelReached: 1, // Esse vai ser um array no futuro, mas por enquanto usamos como max global ou map individual
     history: {},
     inventory: ['green'], // Cores do avatar
-    equippedColor: 'green'
+    equippedColor: 'green',
+    animalIcon: 'fa-dog'
 };
 
 function saveProgress() {
@@ -83,11 +87,13 @@ function loadProgress(username) {
         if (!gameState.inventory) {
             gameState.inventory = ['green'];
             gameState.equippedColor = 'green';
+            gameState.animalIcon = 'fa-dog';
         }
+        if (!gameState.animalIcon) gameState.animalIcon = 'fa-dog';
         isNewUser = false;
     } else {
         // Novo usuario
-        gameState = { lives: 3, gems: 0, streak: 0, maxLevelReached: 1, history: {}, inventory: ['green'], equippedColor: 'green' };
+        gameState = { lives: 3, gems: 0, streak: 0, maxLevelReached: 1, history: {}, inventory: ['green'], equippedColor: 'green', animalIcon: 'fa-dog' };
         isNewUser = true;
         saveProgress();
     }
@@ -105,9 +111,13 @@ function applyAvatarSettings() {
     const c = colorMap[gameState.equippedColor] || 'var(--success)';
     
     document.getElementById('header-avatar').style.backgroundColor = c;
+    document.getElementById('header-avatar').innerHTML = `<i class="fa-solid ${gameState.animalIcon}"></i>`;
     
     const bigAv = document.getElementById('big-avatar');
-    if (bigAv) bigAv.style.color = c;
+    if (bigAv) {
+        bigAv.style.color = c;
+        bigAv.innerHTML = `<i class="fa-solid ${gameState.animalIcon}"></i>`;
+    }
 }
 
 // Configuração das Fases (Normal -> Boss sempre cumulativo)
@@ -208,7 +218,7 @@ function showScreen(screenEl, showHeader = true) {
 }
 
 // ==========================================
-// LOGIN
+// LOGIN E NAVEGAÇÃO INICIAL
 // ==========================================
 loginForm.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -219,12 +229,49 @@ loginForm.addEventListener('submit', (e) => {
         updateGlobalUI();
         
         if (isNewUser) {
-            startAssessment();
+            showScreen(screenAnimalSelect, false);
         } else {
-            renderMap();
-            showScreen(screenMap);
+            showScreen(screenOperationSelect, true);
         }
     }
+});
+
+// Seleção de Animal
+const animalOptions = document.querySelectorAll('.animal-option');
+animalOptions.forEach(opt => {
+    opt.addEventListener('click', () => {
+        sfx.click();
+        animalOptions.forEach(o => o.classList.remove('selected'));
+        opt.classList.add('selected');
+    });
+});
+
+document.getElementById('btn-confirm-animal').addEventListener('click', () => {
+    const selected = document.querySelector('.animal-option.selected');
+    if (selected) {
+        sfx.click();
+        gameState.animalIcon = selected.dataset.icon;
+        saveProgress();
+        applyAvatarSettings();
+        startAssessment();
+    } else {
+        alert("Escolha um parceiro primeiro!");
+    }
+});
+
+// Seleção de Operação (Lobby)
+document.querySelectorAll('.op-card').forEach(card => {
+    card.addEventListener('click', () => {
+        sfx.click();
+        currentMode = card.dataset.op;
+        renderMap();
+        showScreen(screenMap, true);
+    });
+});
+
+document.getElementById('btn-back-hub').addEventListener('click', () => {
+    sfx.click();
+    showScreen(screenOperationSelect, true);
 });
 
 // ==========================================
@@ -233,18 +280,35 @@ loginForm.addEventListener('submit', (e) => {
 function renderMap() {
     mapNodesContainer.innerHTML = '';
     
-    levels.forEach(level => {
+    // Filtra as fases com base na operação escolhida, ou gera um mapa misto na hora
+    let displayLevels = [];
+    if (currentMode === 'mixed') {
+        // Pega as 20 primeiras fases como molde, mas transforma elas em mixed
+        displayLevels = levels.slice(0, 20).map(l => ({...l, op: 'mixed', title: l.type==='boss'? 'Chefão Misto' : `Misto Fase ${l.id}`}));
+    } else {
+        displayLevels = levels.filter(l => l.op === currentMode);
+    }
+    
+    displayLevels.forEach((level, index) => {
         const wrapper = document.createElement('div');
         wrapper.classList.add('node-wrapper');
         const node = document.createElement('div');
         node.classList.add('map-node');
         const label = document.createElement('div');
         label.classList.add('node-label');
-        label.textContent = `Fase ${level.id}`;
         
+        // Fase visual é apenas o indice (1 a 20)
+        const visualPhaseId = index + 1;
+        label.textContent = `Fase ${visualPhaseId}`;
+        
+        // Para progresso, como temos um maxLevelReached universal por enquanto, vamos usar o index
+        // O ideal no futuro seria salvar progresso por modo, mas por enquanto:
+        const isUnlocked = visualPhaseId <= gameState.maxLevelReached;
+        const isActive = visualPhaseId === gameState.maxLevelReached;
+
         if (level.type === 'boss') {
             node.classList.add('boss');
-            if (level.id <= gameState.maxLevelReached) {
+            if (isUnlocked) {
                 node.innerHTML = '<i class="fa-solid fa-skull"></i>';
                 node.style.backgroundColor = 'var(--purple)';
                 node.style.color = 'white';
@@ -253,10 +317,10 @@ function renderMap() {
                 node.innerHTML = '<i class="fa-solid fa-skull"></i>';
             }
         } else {
-            if (level.id < gameState.maxLevelReached) {
+            if (visualPhaseId < gameState.maxLevelReached) {
                 node.classList.add('completed');
                 node.innerHTML = '<i class="fa-solid fa-check"></i>';
-            } else if (level.id === gameState.maxLevelReached) {
+            } else if (isActive) {
                 node.classList.add('active');
                 node.innerHTML = '<i class="fa-solid fa-star"></i>';
                 const startLabel = document.createElement('div');
@@ -270,8 +334,9 @@ function renderMap() {
         }
 
         node.addEventListener('click', () => {
-            if (level.id <= gameState.maxLevelReached) {
-                startLevel(level);
+            if (isUnlocked) {
+                // Passa visualPhaseId para poder salvar o progresso corretamente
+                startLevel({...level, visualPhaseId});
             }
         });
 
@@ -280,12 +345,9 @@ function renderMap() {
         mapNodesContainer.appendChild(wrapper);
     });
 
-    // Auto-scroll to active node
     setTimeout(() => {
         const activeNode = document.querySelector('.map-node.active');
-        if (activeNode) {
-            activeNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
+        if (activeNode) activeNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, 100);
 }
 
@@ -353,37 +415,47 @@ function calculateExpected(n1, n2, op) {
     return 0;
 }
 
+let lastQuestionStr = "";
+
 function generateNormalQuestion() {
-    let n1, n2;
-    const op = activeLevelData.op || '*';
-    document.getElementById('op-display').textContent = getOperatorSymbol(op);
+    let n1, n2, op;
+    let newStr = "";
     
-    // Repetição Espaçada: 30% de chance de forçar uma conta que o aluno mais errou
-    const mistakes = Object.entries(gameState.history || {}).filter(([k, v]) => v.wrong > v.correct && k.includes(op));
-    
-    if (mistakes.length > 0 && Math.random() < 0.3) {
-        const randomMistake = mistakes[Math.floor(Math.random() * mistakes.length)][0];
-        const parts = randomMistake.split(op);
-        n1 = parseInt(parts[0]);
-        n2 = parseInt(parts[1]);
-    } else {
-        if (op === '/') {
-            // Divisão exata: n2 é a tabuada, o res é aleatório, n1 = n2 * res
-            n2 = activeLevelData.table;
-            let res = getRandomInt(2, 9);
-            n1 = n2 * res;
-        } else if (op === '-') {
-            // Subtração sem número negativo: n1 maior ou igual a n2
-            n2 = activeLevelData.table;
-            n1 = getRandomInt(n2, n2 + 9);
+    do {
+        op = activeLevelData.op === 'mixed' ? ['+', '-', '*', '/'][getRandomInt(0, 3)] : (activeLevelData.op || '*');
+        
+        // Repetição Espaçada: 30% de chance de forçar uma conta que o aluno mais errou
+        const mistakes = Object.entries(gameState.history || {}).filter(([k, v]) => v.wrong > v.correct && k.includes(op));
+        
+        if (mistakes.length > 0 && Math.random() < 0.3) {
+            const randomMistake = mistakes[Math.floor(Math.random() * mistakes.length)][0];
+            const parts = randomMistake.split(op);
+            n1 = parseInt(parts[0]);
+            n2 = parseInt(parts[1]);
         } else {
-            n1 = activeLevelData.table;
-            n2 = getRandomInt(2, 9);
-            if (Math.random() > 0.5) [n1, n2] = [n2, n1];
+            if (op === '/') {
+                n2 = activeLevelData.table;
+                let res = getRandomInt(2, 9);
+                n1 = n2 * res;
+            } else if (op === '-') {
+                n2 = activeLevelData.table;
+                n1 = getRandomInt(n2, n2 + 9);
+            } else {
+                n1 = activeLevelData.table;
+                n2 = getRandomInt(2, 9);
+                if (Math.random() > 0.5) [n1, n2] = [n2, n1];
+            }
         }
-    }
+        newStr = `${n1}${op}${n2}`;
+    } while (newStr === lastQuestionStr);
     
+    lastQuestionStr = newStr;
+    document.getElementById('op-display').textContent = getOperatorSymbol(op);
     currentExpectedAnswer = calculateExpected(n1, n2, op);
+    
+    // Save current operation so submit function knows
+    activeLevelData.currentOp = op; 
+    
     num1El.textContent = n1;
     num2El.textContent = n2;
     currentInputValue = "";
@@ -408,7 +480,7 @@ keyEnter.addEventListener('click', () => submitNormalAnswer());
 
 function submitNormalAnswer() {
     if (currentInputValue === "") return;
-    const op = activeLevelData.op || '*';
+    const op = activeLevelData.currentOp || '*';
     if (parseInt(currentInputValue) === currentExpectedAnswer) {
         sfx.correct();
         registerAnswer(parseInt(num1El.textContent), parseInt(num2El.textContent), op, true);
@@ -463,33 +535,41 @@ function startBossLevel() {
 }
 
 function generateBossQuestion() {
-    let n1, n2;
-    const op = activeLevelData.op || '*';
-    document.getElementById('b-op-display').textContent = getOperatorSymbol(op);
+    let n1, n2, op;
+    let newStr = "";
     
-    const mistakes = Object.entries(gameState.history || {}).filter(([k, v]) => v.wrong > v.correct && k.includes(op));
-    
-    if (mistakes.length > 0 && Math.random() < 0.4) { // 40% no boss
-        const randomMistake = mistakes[Math.floor(Math.random() * mistakes.length)][0];
-        const parts = randomMistake.split(op);
-        n1 = parseInt(parts[0]);
-        n2 = parseInt(parts[1]);
-    } else {
-        if (op === '/') {
-            n2 = getRandomInt(activeLevelData.min, activeLevelData.max);
-            let res = getRandomInt(2, 9);
-            n1 = n2 * res;
-        } else if (op === '-') {
-            n2 = getRandomInt(activeLevelData.min, activeLevelData.max);
-            n1 = getRandomInt(n2, n2 + 9);
+    do {
+        op = activeLevelData.op === 'mixed' ? ['+', '-', '*', '/'][getRandomInt(0, 3)] : (activeLevelData.op || '*');
+        const mistakes = Object.entries(gameState.history || {}).filter(([k, v]) => v.wrong > v.correct && k.includes(op));
+        
+        if (mistakes.length > 0 && Math.random() < 0.4) {
+            const randomMistake = mistakes[Math.floor(Math.random() * mistakes.length)][0];
+            const parts = randomMistake.split(op);
+            n1 = parseInt(parts[0]);
+            n2 = parseInt(parts[1]);
         } else {
-            n1 = getRandomInt(activeLevelData.min, activeLevelData.max);
-            n2 = getRandomInt(2, 9);
-            if (Math.random() > 0.5) [n1, n2] = [n2, n1];
+            if (op === '/') {
+                n2 = getRandomInt(activeLevelData.min, activeLevelData.max);
+                let res = getRandomInt(2, 9);
+                n1 = n2 * res;
+            } else if (op === '-') {
+                n2 = getRandomInt(activeLevelData.min, activeLevelData.max);
+                n1 = getRandomInt(n2, n2 + 9);
+            } else {
+                n1 = getRandomInt(activeLevelData.min, activeLevelData.max);
+                n2 = getRandomInt(2, 9);
+                if (Math.random() > 0.5) [n1, n2] = [n2, n1];
+            }
         }
-    }
+        newStr = `${n1}${op}${n2}`;
+    } while (newStr === lastQuestionStr);
     
+    lastQuestionStr = newStr;
+    document.getElementById('b-op-display').textContent = getOperatorSymbol(op);
     currentExpectedAnswer = calculateExpected(n1, n2, op);
+    
+    activeLevelData.currentOp = op;
+
     bNum1.textContent = n1;
     bNum2.textContent = n2;
     currentInputValue = "";
@@ -518,7 +598,7 @@ bKeyEnter.addEventListener('click', () => {
     bossIcon.classList.remove('boss-anim-hit', 'boss-anim-heal');
     void bossIcon.offsetWidth;
 
-    const op = activeLevelData.op || '*';
+    const op = activeLevelData.currentOp || '*';
     if (parseInt(currentInputValue) === currentExpectedAnswer) {
         sfx.bossHit();
         registerAnswer(parseInt(bNum1.textContent), parseInt(bNum2.textContent), op, true);
@@ -578,17 +658,19 @@ function updateBossHearts() {
 // ==========================================
 function winLevel() {
     sfx.win();
-    if (activeLevelData.id === gameState.maxLevelReached) {
+    const gemsReward = (activeLevelData.type === 'boss') ? 10 : 5;
+    document.getElementById('win-title-text').textContent = (activeLevelData.type === 'boss') ? 'Chefão Derrotado!' : 'Fase Concluída!';
+    document.getElementById('win-correct').textContent = currentPhaseTarget;
+    document.getElementById('win-total').textContent = currentPhaseTarget;
+    document.getElementById('win-gems').textContent = gemsReward;
+    
+    gameState.gems += gemsReward;
+    
+    if (activeLevelData.visualPhaseId === gameState.maxLevelReached) {
         gameState.maxLevelReached++;
         gameState.streak++; // Ganha ofensiva
     }
     
-    const gemsReward = activeLevelData.type === 'boss' ? 50 : 10;
-    gameState.gems += gemsReward;
-    saveProgress();
-    
-    document.getElementById('win-gems').textContent = gemsReward;
-    document.getElementById('win-correct').textContent = currentPhaseScore;
     document.getElementById('win-total').textContent = currentPhaseTarget;
     
     updateGlobalUI();
@@ -675,19 +757,18 @@ aKeyEnter.addEventListener('click', () => {
 });
 
 function finishAssessment() {
-    // Define o nível com base nos acertos
-    if (assessmentCorrectCount >= 4) gameState.maxLevelReached = 7;
-    else if (assessmentCorrectCount === 3) gameState.maxLevelReached = 5;
-    else if (assessmentCorrectCount === 2) gameState.maxLevelReached = 3;
-    else gameState.maxLevelReached = 1;
+    gameState.maxLevelReached = 1;
+    if (assessmentCorrectCount >= 5) gameState.maxLevelReached = 7;
+    else if (assessmentCorrectCount >= 4) gameState.maxLevelReached = 5;
+    else if (assessmentCorrectCount >= 3) gameState.maxLevelReached = 3;
     
     gameState.gems += (assessmentCorrectCount * 10);
     saveProgress();
     updateGlobalUI();
+    isNewUser = false;
     
-    alert(`Teste concluído! Você acertou ${assessmentCorrectCount}. O app te colocou no Nível ${gameState.maxLevelReached}.`);
-    renderMap();
-    showScreen(screenMap);
+    alert(`Teste concluído! Você acertou ${assessmentCorrectCount} de 5.`);
+    showScreen(screenOperationSelect, true);
 }
 
 // ==========================================

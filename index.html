@@ -23,6 +23,51 @@
             </div>
         </section>
 
+        <!-- TELA 0.5: Escolha do Animal -->
+        <section id="screen-animal-select" class="screen hidden">
+            <div class="game-header">
+                <h3>Escolha seu Parceiro!</h3>
+                <p style="color:var(--gray-light); font-size:0.8rem;">Este animal será seu herói na jornada.</p>
+            </div>
+            <div class="animal-grid" id="animal-selection-grid">
+                <div class="animal-option" data-icon="fa-dog"><i class="fa-solid fa-dog"></i></div>
+                <div class="animal-option" data-icon="fa-cat"><i class="fa-solid fa-cat"></i></div>
+                <div class="animal-option" data-icon="fa-frog"><i class="fa-solid fa-frog"></i></div>
+                <div class="animal-option" data-icon="fa-crow"><i class="fa-solid fa-crow"></i></div>
+            </div>
+            <button class="primary-btn mt-2" id="btn-confirm-animal" style="margin-top: auto;">Pronto!</button>
+        </section>
+
+        <!-- TELA 0.6: Hub de Operações -->
+        <section id="screen-operation-select" class="screen hidden">
+            <div class="game-header">
+                <h3>Treinamento</h3>
+                <p style="color:var(--gray-light); font-size:0.8rem;">O que vamos treinar hoje?</p>
+            </div>
+            <div class="operation-cards">
+                <div class="op-card" data-op="+">
+                    <i class="fa-solid fa-plus text-success"></i>
+                    <span>Adição</span>
+                </div>
+                <div class="op-card" data-op="-">
+                    <i class="fa-solid fa-minus text-danger"></i>
+                    <span>Subtração</span>
+                </div>
+                <div class="op-card" data-op="*">
+                    <i class="fa-solid fa-xmark text-secondary"></i>
+                    <span>Multiplicação</span>
+                </div>
+                <div class="op-card" data-op="/">
+                    <i class="fa-solid fa-divide text-orange"></i>
+                    <span>Divisão</span>
+                </div>
+                <div class="op-card mixed-card" data-op="mixed">
+                    <i class="fa-solid fa-shuffle text-purple"></i>
+                    <span>Modo Misto</span>
+                </div>
+            </div>
+        </section>
+
         <!-- Cabeçalho Global -->
         <header id="global-header" class="hidden">
             <div class="user-profile">
@@ -102,10 +147,11 @@
             </div>
         </section>
 
-        <!-- TELA 1: Mapa / Trilha -->
+        <!-- TELA 1: Mapa (Trilha) -->
         <section id="screen-map" class="screen hidden">
-            <div class="phase-card">
-                <div class="phase-info">
+            <div class="phase-card" style="position:relative;">
+                <button class="quit-btn" id="btn-back-hub" style="position:absolute; top:15px; left:15px; font-size:1.2rem; color:white; z-index:20;"><i class="fa-solid fa-arrow-left"></i></button>
+                <div class="phase-info" style="margin-left: 20px;">
                     <p class="phase-subtitle">MUNDO 1 - FASE ATUAL</p>
                     <h2 class="phase-title" id="phase-title-card">O Início</h2>
                     <p class="phase-desc" id="phase-desc-card">Tabuadas Iniciais</p>
