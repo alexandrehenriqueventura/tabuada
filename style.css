@@ -1,0 +1,202 @@
+:root {
+    --bg-dark: #151c36;
+    --bg-card: #20b2ff;
+    --text-light: #ffffff;
+    --primary: #facc15;
+    --primary-dark: #eab308;
+    --secondary: #20b2ff;
+    --success: #10b981;
+    --danger: #ef4444;
+    --gray-dark: #334155;
+    --gray-light: #94a3b8;
+    --purple: #a855f7;
+    --orange: #f97316;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Nunito', sans-serif; }
+
+body {
+    background-color: #0b0f19; display: flex; justify-content: center;
+    min-height: 100vh; color: var(--text-light);
+}
+
+#app-container {
+    background-color: var(--bg-dark); width: 100%; max-width: 414px;
+    min-height: 100vh; display: flex; flex-direction: column;
+    position: relative; overflow-x: hidden; box-shadow: 0 0 30px rgba(0,0,0,0.5);
+}
+
+.hidden { display: none !important; }
+.text-orange { color: var(--orange); }
+.text-yellow { color: var(--primary); }
+.text-purple { color: var(--purple); }
+.text-red { color: var(--danger); }
+.text-gray { color: var(--gray-dark); }
+.mt-2 { margin-top: 1.5rem; }
+
+/* TELA LOGIN */
+.login-content { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center;}
+.login-icon { font-size: 5rem; color: var(--secondary); margin-bottom: 2rem; animation: float 3s ease-in-out infinite; }
+.login-title { font-size: 2.2rem; font-weight: 900; margin-bottom: 0.5rem; }
+.login-subtitle { color: var(--gray-light); margin-bottom: 2rem; }
+#login-form { display: flex; flex-direction: column; width: 100%; padding: 0 20px; }
+#username-input { 
+    padding: 15px; font-size: 1.2rem; border-radius: 16px; border: 2px solid var(--gray-dark);
+    background: transparent; color: white; text-align: center; outline: none; transition: border 0.3s;
+}
+#username-input:focus { border-color: var(--secondary); }
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+/* Global Header */
+#global-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1rem; background: transparent; z-index: 10;
+}
+.user-profile { display: flex; align-items: center; gap: 10px; }
+.avatar { width: 40px; height: 40px; background-color: var(--success); border-radius: 12px; }
+.user-info { display: flex; flex-direction: column; }
+.user-name { font-weight: 800; font-size: 1.1rem; }
+.user-subtitle { font-size: 0.75rem; color: var(--gray-light); text-transform: uppercase; letter-spacing: 1px; }
+.stats-container { display: flex; gap: 12px; font-weight: 800; font-size: 1rem; }
+.stat { display: flex; align-items: center; gap: 4px; }
+
+/* Screens */
+.screen { flex: 1; display: flex; flex-direction: column; padding: 1rem; overflow-y: auto; }
+
+/* Mapa */
+.phase-card {
+    background-color: var(--bg-card); border-radius: 20px; padding: 1.5rem;
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;
+}
+.phase-subtitle { font-size: 0.7rem; font-weight: 800; opacity: 0.9; }
+.phase-title { font-size: 1.8rem; font-weight: 900; margin: 5px 0; }
+.phase-desc { font-size: 0.9rem; opacity: 0.9; }
+.phase-monster { font-size: 3rem; color: rgba(255,255,255,0.8); }
+
+.map-container { display: flex; flex-direction: column; align-items: center; padding-bottom: 4rem; gap: 50px; }
+.node-wrapper { position: relative; display: flex; flex-direction: column; align-items: center; width: 100%; }
+.node-wrapper:nth-child(even) .map-node { margin-left: -100px; }
+.node-wrapper:nth-child(odd) .map-node { margin-right: -100px; }
+.map-node {
+    width: 70px; height: 70px; border-radius: 50%; display: flex; justify-content: center; align-items: center;
+    font-size: 1.8rem; color: var(--text-light); background-color: var(--bg-dark); border: 4px solid var(--gray-dark);
+    cursor: pointer; box-shadow: inset 0 -4px 0 rgba(0,0,0,0.2);
+}
+.node-label { position: absolute; bottom: -25px; font-size: 0.8rem; font-weight: 700; color: var(--gray-light); }
+.start-label { position: absolute; top: -35px; background-color: var(--text-light); color: var(--bg-dark); font-size: 0.8rem; font-weight: 800; padding: 4px 12px; border-radius: 12px; }
+.map-node.completed { background-color: var(--secondary); border-color: var(--text-light); }
+.map-node.active { background-color: var(--primary); border-color: var(--text-light); color: var(--bg-dark); }
+.map-node.locked { background-color: var(--bg-dark); border-color: var(--gray-dark); color: var(--gray-dark); }
+.map-node.boss { border-radius: 20px; width: 80px; background-color: var(--gray-dark); color: rgba(255,255,255,0.3); }
+
+/* TELA DE JOGO NORMAL */
+.game-header { display: flex; flex-direction: column; align-items: center; margin-bottom: 1rem; width: 100%; position: relative;}
+.game-header h3 { margin: 0; }
+.close-btn { position: absolute; right: 0; top: 0; background: transparent; border: none; color: var(--gray-light); font-size: 1.5rem; cursor: pointer; padding: 5px; }
+
+.progress-bar { width: 100%; height: 16px; background-color: var(--gray-dark); border-radius: 8px; overflow: hidden; margin-top: 1rem; }
+#progress-fill, #assessment-progress-fill { height: 100%; background-color: var(--success); transition: width 0.3s; }
+.game-content { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; }
+.combo-text { font-size: 0.9rem; font-weight: 800; color: var(--gray-light); letter-spacing: 1px; transition: opacity 0.3s; }
+.question-container { font-size: 4rem; font-weight: 900; text-align: center; color: var(--text-light); display: flex; justify-content: center; gap: 15px; margin-bottom: 1.5rem; align-items: center; }
+.inline-answer {
+    display: inline-block;
+    min-width: 80px; height: 80px; font-size: 4rem; text-align: center; line-height: 70px;
+    background-color: var(--bg-dark); color: var(--text-light);
+    border: 3px dashed var(--gray-light); border-radius: 16px; font-weight: bold;
+    padding: 0 10px; margin-left: 10px; vertical-align: middle;
+}
+.inline-answer.empty { color: var(--gray-dark); border-color: var(--gray-dark); }
+.feedback { text-align: center; margin-top: 1rem; font-size: 1.5rem; font-weight: bold; height: 2rem; }
+
+/* TELA DO CHEFÃO */
+#screen-boss { background-color: var(--bg-dark); }
+.boss-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; font-weight: 800;}
+.boss-name-container { display: flex; align-items: center; gap: 15px; }
+.boss-timer { color: var(--secondary); font-size: 1.2rem; }
+
+.boss-arena { display: flex; flex-direction: column; align-items: center; width: 100%; }
+.boss-avatar { font-size: 6rem; color: var(--purple); animation: float 2s ease-in-out infinite; margin-bottom: 1rem;}
+.boss-health-container { width: 80%; }
+.health-bar-bg { width: 100%; height: 16px; background-color: var(--gray-dark); border-radius: 8px; overflow: hidden; margin-bottom: 5px; }
+.health-bar-fill { height: 100%; background: linear-gradient(90deg, var(--purple), #f472b6); transition: width 0.3s ease-out; }
+.health-stats { display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 800; color: var(--primary); letter-spacing: 1px; }
+
+.player-hearts { margin-top: 1.5rem; font-size: 1.5rem; display: flex; gap: 5px; }
+
+/* VIRTUAL KEYBOARD */
+.virtual-keyboard {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%;
+    max-width: 380px; margin: 0 auto; padding-bottom: 1rem;
+}
+.key {
+    background-color: var(--text-light); color: var(--bg-dark); border: none;
+    border-radius: 16px; padding: 20px 0; font-size: 2rem; font-weight: 900;
+    cursor: pointer; box-shadow: 0 6px 0 var(--gray-light); transition: transform 0.1s, box-shadow 0.1s;
+}
+.key:active { transform: translateY(6px); box-shadow: 0 0 0 transparent; }
+.key.action-key { background-color: var(--danger); color: white; box-shadow: 0 6px 0 #b91c1c;}
+.key.submit-key { background-color: var(--success); color: white; box-shadow: 0 6px 0 #047857;}
+
+/* TELA DE VITÓRIA / DERROTA */
+.win-bg { background: radial-gradient(circle at center, #263359 0%, var(--bg-dark) 70%); }
+.win-content { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; }
+.monster-defeated { position: relative; font-size: 4rem; color: var(--purple); margin-bottom: 2rem; }
+.chat-bubble { position: absolute; top: -30px; right: -50px; background: white; color: var(--bg-dark); padding: 5px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; }
+.medal-container { width: 100px; height: 100px; background-color: var(--secondary); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 3rem; color: white; border: 4px solid rgba(255,255,255,0.2); box-shadow: 0 0 30px var(--secondary); margin-bottom: 1rem; }
+.boss-tag { background-color: var(--primary); color: var(--bg-dark); font-weight: 800; padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; margin-bottom: 1rem; }
+.win-title { font-size: 2rem; font-weight: 900; text-align: center; }
+.win-subtitle { font-size: 1rem; color: var(--gray-light); margin-bottom: 2rem; text-align: center; }
+.win-stats-card { background-color: var(--text-light); color: var(--bg-dark); width: 100%; border-radius: 16px; padding: 1.5rem; text-align: center; }
+.win-stats-card p { margin: 5px 0; }
+.final-blow { font-size: 1.1rem; }
+.gem-reward { font-size: 1rem; font-weight: 800; color: var(--purple); }
+.primary-btn { background-color: var(--text-light); color: var(--bg-dark); border: none; padding: 18px 30px; font-size: 1.2rem; border-radius: 16px; cursor: pointer; font-weight: 900; width: 100%; text-transform: uppercase; box-shadow: 0 6px 0 var(--gray-light); transition: transform 0.1s; }
+.primary-btn:active { transform: translateY(6px); box-shadow: 0 0 0 transparent; }
+
+/* ANIMAÇÕES DO CHEFÃO */
+@keyframes bossHit {
+    0% { transform: scale(1) translateX(0); filter: hue-rotate(0deg); }
+    25% { transform: scale(0.9) translateX(-10px); filter: brightness(1.5); color: #ef4444; }
+    50% { transform: scale(0.9) translateX(10px); filter: brightness(1.5); color: #ef4444; }
+    75% { transform: scale(0.9) translateX(-10px); filter: brightness(1.5); color: #ef4444; }
+    100% { transform: scale(1) translateX(0); filter: hue-rotate(0deg); }
+}
+
+@keyframes bossHeal {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); filter: drop-shadow(0 0 30px #10b981); color: #10b981; }
+    100% { transform: scale(1); }
+}
+
+.boss-anim-hit { animation: bossHit 0.4s ease-in-out; }
+.boss-anim-heal { animation: bossHeal 0.6s ease-in-out; }
+
+/* AVATAR & STORE */
+#header-avatar { display: flex; justify-content: center; align-items: center; color: white; font-size: 1.5rem; }
+.avatar-preview-box { display: flex; justify-content: center; padding: 2rem 0; background: var(--gray-dark); border-radius: 16px; margin-bottom: 2rem; }
+.big-avatar { font-size: 6rem; color: var(--success); transition: color 0.3s; }
+.store-items { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+.store-item { background: var(--bg-card); padding: 1rem; border-radius: 16px; text-align: center; cursor: pointer; border: 3px solid transparent; }
+.store-item.owned { background: var(--gray-dark); opacity: 0.8; }
+.store-item.equipped { border-color: var(--primary); background: var(--gray-dark); }
+.item-price { font-weight: 800; color: var(--purple); margin-top: 5px; }
+
+/* BADGES / CONQUISTAS */
+.badges-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding-bottom: 2rem;}
+.badge-slot { background: var(--gray-dark); border-radius: 50%; aspect-ratio: 1; display: flex; justify-content: center; align-items: center; font-size: 2rem; color: rgba(255,255,255,0.1); border: 2px dashed rgba(255,255,255,0.2); }
+.badge-slot.unlocked { background: var(--primary); color: var(--bg-dark); border: 4px solid var(--text-light); box-shadow: 0 0 15px var(--primary); }
+
+/* RESPONSIVIDADE PARA SMARTPHONES (Telas < 380px como iPhone SE, Androids antigos) */
+@media (max-width: 380px) {
+    .question-container { font-size: 3rem; margin-bottom: 1rem; }
+    .inline-answer { font-size: 3rem; min-width: 60px; height: 60px; line-height: 50px; }
+    .key { padding: 15px 0; font-size: 1.5rem; }
+    .boss-avatar { font-size: 4.5rem; }
+    .login-title { font-size: 1.8rem; }
+    .virtual-keyboard { gap: 8px; }
+}

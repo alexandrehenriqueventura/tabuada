@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabuada Adventure</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="app-container">
+        <!-- TELA 0: Login -->
+        <section id="screen-login" class="screen active">
+            <div class="login-content">
+                <i class="fa-solid fa-gamepad login-icon"></i>
+                <h1 class="login-title">Bem-vindo à Tabuada!</h1>
+                <p class="login-subtitle">Qual é o seu nome, aventureiro?</p>
+                <form id="login-form">
+                    <input type="text" id="username-input" placeholder="Digite seu nome..." required autocomplete="off">
+                    <button type="submit" class="primary-btn mt-2">Começar Aventura</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Cabeçalho Global -->
+        <header id="global-header" class="hidden">
+            <div class="user-profile">
+                <div class="avatar" id="header-avatar"><i class="fa-solid fa-user-astronaut"></i></div>
+                <div class="user-info">
+                    <span class="user-name" id="display-username">Jogador</span>
+                    <span class="user-subtitle">Fase <span id="header-phase-num">1</span></span>
+                </div>
+            </div>
+            <div class="stats-container">
+                <div class="stat" id="btn-badges" style="cursor:pointer;"><i class="fa-solid fa-medal text-secondary"></i></div>
+                <div class="stat" id="btn-store" style="cursor:pointer;"><i class="fa-solid fa-store text-success"></i></div>
+                <div class="stat"><i class="fa-solid fa-fire text-orange"></i> <span id="global-streak">0</span></div>
+                <div class="stat"><i class="fa-solid fa-bolt text-yellow"></i> <span id="global-lives">3</span></div>
+                <div class="stat"><i class="fa-solid fa-gem text-purple"></i> <span id="global-gems">0</span></div>
+            </div>
+        </header>
+
+        <!-- TELA: Teste de Nivelamento -->
+        <section id="screen-assessment" class="screen hidden">
+            <div class="game-header">
+                <h3>Teste de Nivelamento</h3>
+                <p style="color:var(--gray-light); font-size:0.8rem;">Vamos descobrir por onde você deve começar!</p>
+                <div class="progress-bar">
+                    <div id="assessment-progress-fill" style="width: 0%;"></div>
+                </div>
+            </div>
+            <div class="game-content">
+                <div class="question-container">
+                    <span id="a-num1">0</span> 
+                    <span class="operator" style="color:var(--primary); margin:0 10px;">×</span> 
+                    <span id="a-num2">0</span>
+                    <span class="operator" style="margin:0 10px;">=</span>
+                    <span id="assessment-answer-display" class="inline-answer empty">?</span>
+                </div>
+            </div>
+            <div class="virtual-keyboard">
+                <button class="key a-num-key" data-val="1">1</button>
+                <button class="key a-num-key" data-val="2">2</button>
+                <button class="key a-num-key" data-val="3">3</button>
+                <button class="key a-num-key" data-val="4">4</button>
+                <button class="key a-num-key" data-val="5">5</button>
+                <button class="key a-num-key" data-val="6">6</button>
+                <button class="key a-num-key" data-val="7">7</button>
+                <button class="key a-num-key" data-val="8">8</button>
+                <button class="key a-num-key" data-val="9">9</button>
+                <button class="key action-key" id="a-key-del"><i class="fa-solid fa-delete-left"></i></button>
+                <button class="key a-num-key" data-val="0">0</button>
+                <button class="key submit-key" id="a-key-enter"><i class="fa-solid fa-check"></i></button>
+            </div>
+        </section>
+
+        <!-- TELA: Loja / Avatar -->
+        <section id="screen-store" class="screen hidden">
+            <div class="game-header">
+                <h3>Personalizar Personagem</h3>
+                <button class="close-btn" id="close-store"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="avatar-preview-box">
+                <div id="big-avatar" class="big-avatar">
+                    <i class="fa-solid fa-user-astronaut"></i>
+                </div>
+            </div>
+            <div class="store-items" id="store-items-container">
+                <!-- Itens gerados via JS -->
+            </div>
+        </section>
+
+        <!-- TELA: Conquistas -->
+        <section id="screen-badges" class="screen hidden">
+            <div class="game-header">
+                <h3>Suas Medalhas</h3>
+                <button class="close-btn" id="close-badges"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="badges-grid" id="badges-container">
+                <!-- Medalhas geradas via JS -->
+            </div>
+        </section>
+
+        <!-- TELA 1: Mapa / Trilha -->
+        <section id="screen-map" class="screen hidden">
+            <div class="phase-card">
+                <div class="phase-info">
+                    <p class="phase-subtitle">MUNDO 1 - FASE ATUAL</p>
+                    <h2 class="phase-title" id="phase-title-card">O Início</h2>
+                    <p class="phase-desc" id="phase-desc-card">Tabuadas Iniciais</p>
+                </div>
+                <div class="phase-monster">
+                    <i class="fa-solid fa-ghost"></i>
+                </div>
+            </div>
+
+            <div class="map-container" id="map-nodes">
+                <!-- Nodes gerados via JS -->
+            </div>
+        </section>
+
+        <!-- TELA 2: Jogo Normal -->
+        <section id="screen-game" class="screen hidden">
+            <div class="game-header">
+                <h3 id="level-title">Treino</h3>
+                <div class="progress-bar">
+                    <div id="progress-fill" style="width: 0%;"></div>
+                </div>
+            </div>
+
+            <div class="game-content">
+                <div class="combo-text hidden" id="combo-display">COMBO <span id="combo-count">2</span></div>
+                <div class="question-container">
+                    <span id="num1">0</span> 
+                    <span class="operator" style="color:var(--primary); margin:0 10px;">×</span> 
+                    <span id="num2">0</span>
+                    <span class="operator" style="margin:0 10px;">=</span>
+                    <span id="answer-display" class="inline-answer empty">?</span>
+                </div>
+                
+                <div id="feedback" class="feedback"></div>
+            </div>
+
+            <div class="virtual-keyboard">
+                <button class="key num-key" data-val="1">1</button>
+                <button class="key num-key" data-val="2">2</button>
+                <button class="key num-key" data-val="3">3</button>
+                <button class="key num-key" data-val="4">4</button>
+                <button class="key num-key" data-val="5">5</button>
+                <button class="key num-key" data-val="6">6</button>
+                <button class="key num-key" data-val="7">7</button>
+                <button class="key num-key" data-val="8">8</button>
+                <button class="key num-key" data-val="9">9</button>
+                <button class="key action-key" id="key-del"><i class="fa-solid fa-delete-left"></i></button>
+                <button class="key num-key" data-val="0">0</button>
+                <button class="key submit-key" id="key-enter"><i class="fa-solid fa-check"></i></button>
+            </div>
+        </section>
+
+        <!-- TELA 3: Batalha do Chefão -->
+        <section id="screen-boss" class="screen hidden">
+            <div class="boss-header">
+                <div class="boss-name-container">
+                    <i class="fa-solid fa-xmark close-btn" id="boss-giveup"></i>
+                    <h3 id="boss-name">Morcegão, o Barulhento</h3>
+                </div>
+                <div class="boss-timer"><i class="fa-solid fa-stopwatch"></i> <span id="boss-timer-value">60</span>s</div>
+            </div>
+
+            <div class="boss-arena">
+                <div class="boss-avatar">
+                    <i class="fa-solid fa-ghost" id="boss-icon"></i>
+                </div>
+                
+                <div class="boss-health-container">
+                    <div class="health-bar-bg">
+                        <div class="health-bar-fill" id="boss-health-fill" style="width: 100%;"></div>
+                    </div>
+                    <div class="health-stats">
+                        <span>VIDA <span id="boss-hp">100</span>/100</span>
+                        <span>GOLPES DE HOJE <span id="boss-hits">0</span>/<span id="boss-max-hits">18</span></span>
+                    </div>
+                </div>
+
+                <div class="player-hearts" id="boss-player-hearts">
+                    <i class="fa-solid fa-heart text-red"></i>
+                    <i class="fa-solid fa-heart text-red"></i>
+                    <i class="fa-solid fa-heart text-red"></i>
+                </div>
+            </div>
+
+            <div class="game-content" style="flex: 0; margin-bottom: 1rem;">
+                <div class="combo-text" id="boss-combo-display" style="opacity: 0;">COMBO <span id="boss-combo-count">2</span></div>
+                <div class="question-container" style="margin: 0;">
+                    <span id="b-num1">0</span> 
+                    <span class="operator" style="color:var(--primary); margin:0 10px;">×</span> 
+                    <span id="b-num2">0</span>
+                    <span class="operator" style="margin:0 10px;">=</span>
+                    <span id="boss-answer-display" class="inline-answer empty">?</span>
+                </div>
+            </div>
+
+            <div class="virtual-keyboard">
+                <button class="key b-num-key" data-val="1">1</button>
+                <button class="key b-num-key" data-val="2">2</button>
+                <button class="key b-num-key" data-val="3">3</button>
+                <button class="key b-num-key" data-val="4">4</button>
+                <button class="key b-num-key" data-val="5">5</button>
+                <button class="key b-num-key" data-val="6">6</button>
+                <button class="key b-num-key" data-val="7">7</button>
+                <button class="key b-num-key" data-val="8">8</button>
+                <button class="key b-num-key" data-val="9">9</button>
+                <button class="key action-key" id="b-key-del"><i class="fa-solid fa-delete-left"></i></button>
+                <button class="key b-num-key" data-val="0">0</button>
+                <button class="key submit-key" id="b-key-enter"><i class="fa-solid fa-check"></i></button>
+            </div>
+        </section>
+
+        <!-- TELA 4: Vitória -->
+        <section id="screen-win" class="screen hidden win-bg">
+            <div class="win-content">
+                <div class="monster-defeated">
+                    <div class="chat-bubble">Naããão!</div>
+                    <i class="fa-solid fa-ghost"></i>
+                </div>
+                <div class="medal-container"><i class="fa-solid fa-medal"></i></div>
+                <div class="boss-tag" id="win-tag"><i class="fa-solid fa-star"></i> Fase Vencida</div>
+                <h2 class="win-title" id="win-title-text">Fase Concluída!</h2>
+                <div class="win-stats-card">
+                    <p class="final-blow">Acertos: <strong><span id="win-correct">10</span> de <span id="win-total">10</span>.</strong></p>
+                    <p class="gem-reward"><i class="fa-solid fa-gem"></i> + <span id="win-gems">10</span> gemas</p>
+                </div>
+                <button class="primary-btn mt-2" id="btn-back-map-win">Continuar</button>
+            </div>
+        </section>
+
+        <!-- TELA 5: Derrota -->
+        <section id="screen-lose" class="screen hidden">
+            <div class="win-content">
+                <div class="medal-container" style="background-color: var(--danger);"><i class="fa-solid fa-skull"></i></div>
+                <h2 class="win-title">Fim da Linha!</h2>
+                <p class="win-subtitle" id="lose-reason">Você ficou sem energia.</p>
+                <button class="primary-btn mt-2" id="btn-back-map-lose">Voltar ao Mapa</button>
+            </div>
+        </section>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

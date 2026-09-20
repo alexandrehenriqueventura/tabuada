@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel do Professor - Tabuada</title>
+    <link rel="stylesheet" href="painel.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fa-solid fa-graduation-cap"></i> EduPanel</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="active"><i class="fa-solid fa-chart-line"></i> Visão Geral</a>
+                <a href="#"><i class="fa-solid fa-users"></i> Minhas Turmas</a>
+                <a href="#"><i class="fa-solid fa-user-graduate"></i> Alunos</a>
+                <a href="index.html" class="back-app"><i class="fa-solid fa-gamepad"></i> Voltar ao App</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-header">
+                <h1>Painel de Controle - Visão Geral</h1>
+                <div class="teacher-profile">
+                    <span>Prof. Alexandre</span>
+                    <div class="avatar"></div>
+                </div>
+            </header>
+
+            <!-- Cards de Resumo -->
+            <section class="summary-cards">
+                <div class="card">
+                    <div class="card-icon" style="background-color: #e0f2fe; color: #0284c7;"><i class="fa-solid fa-users"></i></div>
+                    <div class="card-info">
+                        <h3>Total de Alunos</h3>
+                        <p id="total-students">0</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" style="background-color: #dcfce7; color: #16a34a;"><i class="fa-solid fa-check-circle"></i></div>
+                    <div class="card-info">
+                        <h3>Fases Concluídas</h3>
+                        <p id="total-completed">0</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" style="background-color: #fee2e2; color: #dc2626;"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    <div class="card-info">
+                        <h3>Alertas (Dificuldade)</h3>
+                        <p>2</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tabela de Alunos -->
+            <section class="students-section">
+                <div class="section-header">
+                    <h2>Desempenho dos Alunos (Turma A)</h2>
+                    <button class="primary-btn-sm"><i class="fa-solid fa-plus"></i> Adicionar Aluno</button>
+                </div>
+                
+                <table class="students-table">
+                    <thead>
+                        <tr>
+                            <th>Nome do Aluno</th>
+                            <th>Fase Atual</th>
+                            <th>Ofensiva (Dias)</th>
+                            <th>Gemas Coletadas</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="students-tbody">
+                        <!-- Gerado via JS -->
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <script src="painel.js"></script>
+</body>
+</html>
