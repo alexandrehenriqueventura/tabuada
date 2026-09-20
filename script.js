@@ -112,12 +112,21 @@ function applyAvatarSettings() {
 
 // Configuração das Fases (Normal -> Boss sempre cumulativo)
 const levels = [
-    { id: 1, type: 'normal', table: 2, targetScore: 5, title: 'Início', desc: 'Tabuada do 2' },
-    { id: 2, type: 'boss', min: 2, max: 2, time: 60, title: 'O Guardião do 2', desc: 'Chefão da Fase 1' },
-    { id: 3, type: 'normal', table: 3, targetScore: 5, title: 'Crescendo', desc: 'Tabuada do 3' },
-    { id: 4, type: 'boss', min: 2, max: 3, time: 60, title: 'Besta Dupla', desc: 'Chefão da Fase 2' },
-    { id: 5, type: 'normal', table: 4, targetScore: 5, title: 'Dobrando', desc: 'Tabuada do 4' },
-    { id: 6, type: 'boss', min: 2, max: 4, time: 60, title: 'Mestre Quarteto', desc: 'Chefão da Fase 3' }
+    { id: 1, type: 'normal', op: '+', table: 2, targetScore: 5, title: 'Iniciante', desc: 'Somas Básicas (+)' },
+    { id: 2, type: 'boss', op: '+', min: 2, max: 5, time: 60, title: 'Rei da Adição', desc: 'Chefão das Somas' },
+    
+    { id: 3, type: 'normal', op: '-', table: 5, targetScore: 5, title: 'Subtraindo', desc: 'Subtrações Básicas (-)' },
+    { id: 4, type: 'boss', op: '-', min: 5, max: 9, time: 60, title: 'Ladrão de Números', desc: 'Chefão da Subtração' },
+
+    { id: 5, type: 'normal', op: '*', table: 2, targetScore: 5, title: 'Dobrando', desc: 'Tabuada do 2 (×)' },
+    { id: 6, type: 'boss', op: '*', min: 2, max: 2, time: 60, title: 'O Guardião do 2', desc: 'Chefão da Fase 1' },
+    { id: 7, type: 'normal', op: '*', table: 3, targetScore: 5, title: 'Crescendo', desc: 'Tabuada do 3 (×)' },
+    { id: 8, type: 'boss', op: '*', min: 2, max: 3, time: 60, title: 'Besta Dupla', desc: 'Chefão da Fase 2' },
+    { id: 9, type: 'normal', op: '*', table: 4, targetScore: 5, title: 'Quarteto', desc: 'Tabuada do 4 (×)' },
+    { id: 10, type: 'boss', op: '*', min: 2, max: 4, time: 60, title: 'Mestre Quarteto', desc: 'Chefão da Fase 3' },
+
+    { id: 11, type: 'normal', op: '/', table: 2, targetScore: 5, title: 'Dividindo', desc: 'Divisões por 2 (÷)' },
+    { id: 12, type: 'boss', op: '/', min: 2, max: 3, time: 60, title: 'O Fracionador', desc: 'Chefão da Divisão' }
 ];
 
 let currentInputValue = "";
@@ -255,8 +264,21 @@ function startLevel(levelData) {
     }
 }
 
-function registerAnswer(n1, n2, isCorrect) {
-    const key = n1 < n2 ? `${n1}x${n2}` : `${n2}x${n1}`;
+function getOperatorSymbol(op) {
+    if (op === '*') return '×';
+    if (op === '/') return '÷';
+    return op;
+}
+
+function registerAnswer(n1, n2, op, isCorrect) {
+    // Normaliza chave. Se for +, * a ordem nao importa. Se for -, / importa.
+    let key;
+    if (op === '+' || op === '*') {
+        key = n1 < n2 ? `${n1}${op}${n2}` : `${n2}${op}${n1}`;
+    } else {
+        key = `${n1}${op}${n2}`;
+    }
+    
     if (!gameState.history) gameState.history = {};
     if (!gameState.history[key]) gameState.history[key] = { correct: 0, wrong: 0 };
     
@@ -266,26 +288,45 @@ function registerAnswer(n1, n2, isCorrect) {
     saveProgress();
 }
 
+function calculateExpected(n1, n2, op) {
+    if (op === '+') return n1 + n2;
+    if (op === '-') return n1 - n2;
+    if (op === '*') return n1 * n2;
+    if (op === '/') return Math.floor(n1 / n2);
+    return 0;
+}
+
 function generateNormalQuestion() {
     let n1, n2;
+    const op = activeLevelData.op || '*';
+    document.getElementById('op-display').textContent = getOperatorSymbol(op);
     
     // Repetição Espaçada: 30% de chance de forçar uma conta que o aluno mais errou
-    const mistakes = Object.entries(gameState.history || {}).filter(([k, v]) => v.wrong > v.correct);
+    const mistakes = Object.entries(gameState.history || {}).filter(([k, v]) => v.wrong > v.correct && k.includes(op));
     
     if (mistakes.length > 0 && Math.random() < 0.3) {
-        // Pega uma aleatória do pool de erros
         const randomMistake = mistakes[Math.floor(Math.random() * mistakes.length)][0];
-        const parts = randomMistake.split('x');
+        const parts = randomMistake.split(op);
         n1 = parseInt(parts[0]);
         n2 = parseInt(parts[1]);
     } else {
-        n1 = activeLevelData.table;
-        n2 = getRandomInt(2, 9);
+        if (op === '/') {
+            // Divisão exata: n2 é a tabuada, o res é aleatório, n1 = n2 * res
+            n2 = activeLevelData.table;
+            let res = getRandomInt(2, 9);
+            n1 = n2 * res;
+        } else if (op === '-') {
+            // Subtração sem número negativo: n1 maior ou igual a n2
+            n2 = activeLevelData.table;
+            n1 = getRandomInt(n2, n2 + 9);
+        } else {
+            n1 = activeLevelData.table;
+            n2 = getRandomInt(2, 9);
+            if (Math.random() > 0.5) [n1, n2] = [n2, n1];
+        }
     }
     
-    if (Math.random() > 0.5) [n1, n2] = [n2, n1];
-    
-    currentExpectedAnswer = n1 * n2;
+    currentExpectedAnswer = calculateExpected(n1, n2, op);
     num1El.textContent = n1;
     num2El.textContent = n2;
     currentInputValue = "";
@@ -310,14 +351,15 @@ keyEnter.addEventListener('click', () => submitNormalAnswer());
 
 function submitNormalAnswer() {
     if (currentInputValue === "") return;
+    const op = activeLevelData.op || '*';
     if (parseInt(currentInputValue) === currentExpectedAnswer) {
-        registerAnswer(parseInt(num1El.textContent), parseInt(num2El.textContent), true);
+        registerAnswer(parseInt(num1El.textContent), parseInt(num2El.textContent), op, true);
         currentPhaseScore++;
         progressFill.style.width = `${(currentPhaseScore / currentPhaseTarget) * 100}%`;
         if (currentPhaseScore >= currentPhaseTarget) { winLevel(); return; }
         generateNormalQuestion();
     } else {
-        registerAnswer(parseInt(num1El.textContent), parseInt(num2El.textContent), false);
+        registerAnswer(parseInt(num1El.textContent), parseInt(num2El.textContent), op, false);
         loseLife();
         currentInputValue = ""; updateNormalDisplay();
     }
@@ -359,21 +401,32 @@ function startBossLevel() {
 
 function generateBossQuestion() {
     let n1, n2;
-    const mistakes = Object.entries(gameState.history || {}).filter(([k, v]) => v.wrong > v.correct);
+    const op = activeLevelData.op || '*';
+    document.getElementById('b-op-display').textContent = getOperatorSymbol(op);
+    
+    const mistakes = Object.entries(gameState.history || {}).filter(([k, v]) => v.wrong > v.correct && k.includes(op));
     
     if (mistakes.length > 0 && Math.random() < 0.4) { // 40% no boss
         const randomMistake = mistakes[Math.floor(Math.random() * mistakes.length)][0];
-        const parts = randomMistake.split('x');
+        const parts = randomMistake.split(op);
         n1 = parseInt(parts[0]);
         n2 = parseInt(parts[1]);
     } else {
-        n1 = getRandomInt(activeLevelData.min, activeLevelData.max);
-        n2 = getRandomInt(2, 9);
+        if (op === '/') {
+            n2 = getRandomInt(activeLevelData.min, activeLevelData.max);
+            let res = getRandomInt(2, 9);
+            n1 = n2 * res;
+        } else if (op === '-') {
+            n2 = getRandomInt(activeLevelData.min, activeLevelData.max);
+            n1 = getRandomInt(n2, n2 + 9);
+        } else {
+            n1 = getRandomInt(activeLevelData.min, activeLevelData.max);
+            n2 = getRandomInt(2, 9);
+            if (Math.random() > 0.5) [n1, n2] = [n2, n1];
+        }
     }
     
-    if (Math.random() > 0.5) [n1, n2] = [n2, n1];
-
-    currentExpectedAnswer = n1 * n2;
+    currentExpectedAnswer = calculateExpected(n1, n2, op);
     bNum1.textContent = n1;
     bNum2.textContent = n2;
     currentInputValue = "";
@@ -402,8 +455,9 @@ bKeyEnter.addEventListener('click', () => {
     bossIcon.classList.remove('boss-anim-hit', 'boss-anim-heal');
     void bossIcon.offsetWidth;
 
+    const op = activeLevelData.op || '*';
     if (parseInt(currentInputValue) === currentExpectedAnswer) {
-        registerAnswer(parseInt(bNum1.textContent), parseInt(bNum2.textContent), true);
+        registerAnswer(parseInt(bNum1.textContent), parseInt(bNum2.textContent), op, true);
         bossIcon.classList.add('boss-anim-hit');
         currentPhaseScore++;
         updateBossHealth();
@@ -414,7 +468,7 @@ bKeyEnter.addEventListener('click', () => {
         }
         generateBossQuestion();
     } else {
-        registerAnswer(parseInt(bNum1.textContent), parseInt(bNum2.textContent), false);
+        registerAnswer(parseInt(bNum1.textContent), parseInt(bNum2.textContent), op, false);
         bossIcon.classList.add('boss-anim-heal');
         currentPhaseScore = Math.max(0, currentPhaseScore - 1);
         updateBossHealth();
@@ -491,11 +545,11 @@ const aKeyEnter = document.getElementById('a-key-enter');
 const aProgressFill = document.getElementById('assessment-progress-fill');
 
 let assessmentQuestions = [
-    { n1: 2, n2: 4 }, // Nivel 1
-    { n1: 3, n2: 6 }, // Nivel 3
-    { n1: 4, n2: 8 }, // Nivel 5
-    { n1: 6, n2: 7 }, // Dificil (Futuro)
-    { n1: 8, n2: 9 }  // Muito Dificil
+    { op: '+', n1: 8, n2: 5 }, // Teste de Soma
+    { op: '-', n1: 15, n2: 7 }, // Teste de Subtração
+    { op: '*', n1: 4, n2: 8 }, // Multiplicação base
+    { op: '/', n1: 24, n2: 4 }, // Divisão
+    { op: '*', n1: 8, n2: 9 }  // Multiplicação Dificil
 ];
 let currentAssessmentIdx = 0;
 let assessmentCorrectCount = 0;
@@ -505,15 +559,17 @@ function startAssessment() {
     currentAssessmentIdx = 0;
     assessmentCorrectCount = 0;
     currentInputValue = "";
-    showScreen(screenAssessment, false); // Esconde header
+    showScreen(screenAssessment, false);
     loadAssessmentQuestion();
 }
 
 function loadAssessmentQuestion() {
     const q = assessmentQuestions[currentAssessmentIdx];
+    const op = q.op || '*';
+    document.getElementById('a-op-display').textContent = getOperatorSymbol(op);
     aNum1.textContent = q.n1;
     aNum2.textContent = q.n2;
-    aExpected = q.n1 * q.n2;
+    aExpected = calculateExpected(q.n1, q.n2, op);
     currentInputValue = "";
     updateADisplay();
     aProgressFill.style.width = `${(currentAssessmentIdx / assessmentQuestions.length) * 100}%`;
