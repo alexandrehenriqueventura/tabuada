@@ -111,23 +111,45 @@ function applyAvatarSettings() {
 }
 
 // Configuração das Fases (Normal -> Boss sempre cumulativo)
-const levels = [
-    { id: 1, type: 'normal', op: '+', table: 2, targetScore: 5, title: 'Iniciante', desc: 'Somas Básicas (+)' },
-    { id: 2, type: 'boss', op: '+', min: 2, max: 5, time: 60, title: 'Rei da Adição', desc: 'Chefão das Somas' },
-    
-    { id: 3, type: 'normal', op: '-', table: 5, targetScore: 5, title: 'Subtraindo', desc: 'Subtrações Básicas (-)' },
-    { id: 4, type: 'boss', op: '-', min: 5, max: 9, time: 60, title: 'Ladrão de Números', desc: 'Chefão da Subtração' },
-
-    { id: 5, type: 'normal', op: '*', table: 2, targetScore: 5, title: 'Dobrando', desc: 'Tabuada do 2 (×)' },
-    { id: 6, type: 'boss', op: '*', min: 2, max: 2, time: 60, title: 'O Guardião do 2', desc: 'Chefão da Fase 1' },
-    { id: 7, type: 'normal', op: '*', table: 3, targetScore: 5, title: 'Crescendo', desc: 'Tabuada do 3 (×)' },
-    { id: 8, type: 'boss', op: '*', min: 2, max: 3, time: 60, title: 'Besta Dupla', desc: 'Chefão da Fase 2' },
-    { id: 9, type: 'normal', op: '*', table: 4, targetScore: 5, title: 'Quarteto', desc: 'Tabuada do 4 (×)' },
-    { id: 10, type: 'boss', op: '*', min: 2, max: 4, time: 60, title: 'Mestre Quarteto', desc: 'Chefão da Fase 3' },
-
-    { id: 11, type: 'normal', op: '/', table: 2, targetScore: 5, title: 'Dividindo', desc: 'Divisões por 2 (÷)' },
-    { id: 12, type: 'boss', op: '/', min: 2, max: 3, time: 60, title: 'O Fracionador', desc: 'Chefão da Divisão' }
+const levels = [];
+const opsInfo = [
+    { op: '+', name: 'Adição', boss: 'Rei da Adição' },
+    { op: '-', name: 'Subtração', boss: 'Ladrão de Números' },
+    { op: '*', name: 'Multiplicação', boss: 'O Guardião' },
+    { op: '/', name: 'Divisão', boss: 'O Fracionador' }
 ];
+
+let idCounter = 1;
+for (const info of opsInfo) {
+    for (let i = 1; i <= 20; i++) {
+        const isBoss = (i % 5 === 0);
+        const stage = Math.ceil(i / 5); // 1 to 4
+        const tableValue = 1 + i;
+        
+        if (isBoss) {
+            levels.push({
+                id: idCounter++,
+                type: 'boss',
+                op: info.op,
+                min: 2,
+                max: 3 + stage,
+                time: 60,
+                title: `${info.boss} (Nv.${stage})`,
+                desc: `Chefão da Fase ${stage}`
+            });
+        } else {
+            levels.push({
+                id: idCounter++,
+                type: 'normal',
+                op: info.op,
+                table: tableValue > 9 ? (tableValue % 8) + 2 : tableValue,
+                targetScore: 5 + stage,
+                title: `${info.name} ${i}`,
+                desc: `Treino Prático (${info.op})`
+            });
+        }
+    }
+}
 
 let currentInputValue = "";
 let currentExpectedAnswer = 0;
@@ -189,16 +211,15 @@ loginForm.addEventListener('submit', (e) => {
 // ==========================================
 function renderMap() {
     mapNodesContainer.innerHTML = '';
-    const reversedLevels = [...levels].reverse();
     
-    reversedLevels.forEach(level => {
+    levels.forEach(level => {
         const wrapper = document.createElement('div');
         wrapper.classList.add('node-wrapper');
         const node = document.createElement('div');
         node.classList.add('map-node');
         const label = document.createElement('div');
         label.classList.add('node-label');
-        label.textContent = `Dia ${level.id}`;
+        label.textContent = `Fase ${level.id}`;
         
         if (level.type === 'boss') {
             node.classList.add('boss');
@@ -237,6 +258,14 @@ function renderMap() {
         wrapper.appendChild(label);
         mapNodesContainer.appendChild(wrapper);
     });
+
+    // Auto-scroll to active node
+    setTimeout(() => {
+        const activeNode = document.querySelector('.map-node.active');
+        if (activeNode) {
+            activeNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }, 100);
 }
 
 // ==========================================

@@ -71,6 +71,7 @@ body {
 .phase-card {
     background-color: var(--bg-card); border-radius: 20px; padding: 1.5rem;
     display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;
+    position: sticky; top: 0; z-index: 10; box-shadow: 0 10px 20px rgba(0,0,0,0.2);
 }
 .phase-subtitle { font-size: 0.7rem; font-weight: 800; opacity: 0.9; }
 .phase-title { font-size: 1.8rem; font-weight: 900; margin: 5px 0; }
