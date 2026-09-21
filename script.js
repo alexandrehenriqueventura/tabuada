@@ -81,8 +81,17 @@ function saveProgress() {
 
 function loadProgress(username) {
     const data = localStorage.getItem(`tabuada_user_${username}`);
+    const today = new Date().toDateString();
+    
     if (data) {
         gameState = JSON.parse(data);
+        
+        // Verifica se é um novo dia para restaurar as vidas
+        if (gameState.lastPlayedDate !== today) {
+            gameState.lives = 3;
+            gameState.lastPlayedDate = today;
+        }
+        
         if (!gameState.history) gameState.history = {};
         if (!gameState.inventory) {
             gameState.inventory = ['green'];
@@ -90,10 +99,16 @@ function loadProgress(username) {
             gameState.animalIcon = 'fa-dog';
         }
         if (!gameState.animalIcon) gameState.animalIcon = 'fa-dog';
+        if (!gameState.lastPlayedDate) gameState.lastPlayedDate = today;
+        
         isNewUser = false;
     } else {
         // Novo usuario
-        gameState = { lives: 3, gems: 0, streak: 0, maxLevelReached: 1, history: {}, inventory: ['green'], equippedColor: 'green', animalIcon: 'fa-dog' };
+        gameState = { 
+            lives: 3, gems: 0, streak: 0, maxLevelReached: 1, 
+            history: {}, inventory: ['green'], equippedColor: 'green', 
+            animalIcon: 'fa-dog', lastPlayedDate: today 
+        };
         isNewUser = true;
         saveProgress();
     }
@@ -677,8 +692,29 @@ function winLevel() {
     showScreen(screenWin, false);
 }
 
-btnBackMapWin.addEventListener('click', () => { renderMap(); showScreen(screenMap); });
-btnBackMapLose.addEventListener('click', () => { renderMap(); showScreen(screenMap); });
+btnBackMapWin.addEventListener('click', () => { renderMap(); showScreen(screenMap, true); });
+btnBackMapLose.addEventListener('click', () => { 
+    if (gameState.lives <= 0) {
+        showScreen(screenOperationSelect, true); 
+    } else {
+        renderMap(); showScreen(screenMap, true);
+    }
+});
+
+document.getElementById('btn-buy-lives').addEventListener('click', () => {
+    if (gameState.gems >= 20) {
+        sfx.correct();
+        gameState.gems -= 20;
+        gameState.lives = 3;
+        saveProgress();
+        updateGlobalUI();
+        alert("Vidas restauradas com sucesso!");
+        showScreen(screenOperationSelect, true);
+    } else {
+        sfx.wrong();
+        alert("Gemas insuficientes! Você precisa de 20 gemas.");
+    }
+});
 
 // ==========================================
 // TESTE DE NIVELAMENTO (Começa do Ponto Certo)
