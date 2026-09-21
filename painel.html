@@ -13,18 +13,19 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
     <style>
-        body { padding: 20px; max-width: 800px; margin: 0 auto; background-color: var(--bg-dark); }
+        body { display: block; padding: 20px; max-width: 800px; margin: 0 auto; background-color: var(--bg-dark); overflow-y: auto; height: auto; }
         .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 2px solid var(--gray-dark); padding-bottom: 1rem; }
-        .student-card { background: var(--bg-card); padding: 15px; border-radius: 12px; margin-bottom: 15px; }
-        .student-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed var(--gray-dark); padding-bottom: 10px; margin-bottom: 10px; }
-        .student-name { font-size: 1.5rem; font-weight: bold; text-transform: capitalize; color: var(--text-light); }
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 10px; }
-        .stat-box { background: var(--gray-dark); padding: 10px; border-radius: 8px; text-align: center; }
-        .stat-box span { font-weight: bold; font-size: 1.2rem; }
+        .student-card { background: var(--bg-card); padding: 20px; border-radius: 16px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .student-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed rgba(255,255,255,0.2); padding-bottom: 15px; margin-bottom: 15px; }
+        .student-name { font-size: 1.8rem; font-weight: 900; text-transform: capitalize; color: white; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 10px; }
+        .stat-box { background: var(--gray-dark); padding: 15px 10px; border-radius: 12px; text-align: center; border: 2px solid rgba(255,255,255,0.05); }
+        .stat-box span { font-weight: 900; font-size: 1.5rem; display: block; margin-top: 5px; }
+        .stat-title { color: rgba(255,255,255,0.7); font-size: 0.9rem; font-weight: 800; text-transform: uppercase; }
         
-        .deficiencies-box { background: rgba(255, 60, 60, 0.1); border: 1px solid var(--danger); padding: 10px; border-radius: 8px; margin-top: 10px; }
-        .deficiencies-box h4 { margin: 0 0 5px 0; color: var(--danger); }
-        .def-tag { display: inline-block; background: var(--danger); color: white; padding: 3px 8px; border-radius: 12px; font-size: 0.8rem; margin: 2px; font-weight: bold;}
+        .deficiencies-box { background: rgba(0, 0, 0, 0.2); border: 2px solid var(--danger); padding: 15px; border-radius: 12px; margin-top: 15px; }
+        .deficiencies-box h4 { margin: 0 0 10px 0; color: #ff6b6b; font-size: 1.1rem; font-weight: 900; }
+        .def-tag { display: inline-block; background: var(--danger); color: white; padding: 5px 12px; border-radius: 12px; font-size: 0.9rem; margin: 3px; font-weight: 900;}
     </style>
 </head>
 <body>

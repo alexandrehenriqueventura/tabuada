@@ -57,21 +57,21 @@ async function loadDashboard() {
             card.innerHTML = `
                 <div class="student-header">
                     <div class="student-name"><i class="fa-solid ${state.animalIcon || 'fa-user'}"></i> ${data.username}</div>
-                    <div style="color:var(--gray-light); font-size:0.8rem;">
+                    <div style="color: rgba(255,255,255,0.9); font-size: 0.9rem; font-weight: bold;">
                         Último acesso: ${state.lastPlayedDate || 'Desconhecido'}
                     </div>
                 </div>
                 <div class="stats-grid">
                     <div class="stat-box">
-                        <div style="color:var(--gray-light); font-size:0.8rem;">Fase Max</div>
+                        <div class="stat-title">Fase Max</div>
                         <span class="text-primary">${state.maxLevelReached || 1}</span>
                     </div>
                     <div class="stat-box">
-                        <div style="color:var(--gray-light); font-size:0.8rem;">Gemas</div>
+                        <div class="stat-title">Gemas</div>
                         <span class="text-secondary"><i class="fa-solid fa-bolt"></i> ${state.gems || 0}</span>
                     </div>
                     <div class="stat-box">
-                        <div style="color:var(--gray-light); font-size:0.8rem;">Ofensiva</div>
+                        <div class="stat-title">Ofensiva</div>
                         <span class="text-orange"><i class="fa-solid fa-medal"></i> ${state.streak || 0} dias</span>
                     </div>
                 </div>
