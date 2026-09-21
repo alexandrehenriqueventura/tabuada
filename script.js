@@ -188,24 +188,43 @@ let bossTimerInterval = null;
 let bossLives = 3;
 
 // Web Audio API Sound System
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+let audioCtx = null;
+function initAudio() {
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+    return audioCtx;
+}
+
+// Destrava áudio em dispositivos móveis no primeiro toque
+document.addEventListener('click', initAudio, { once: true });
+document.addEventListener('touchstart', initAudio, { once: true });
+
 const sfx = {
-    play: (freq, type, dur, vol=0.1) => {
-        if(audioCtx.state === 'suspended') audioCtx.resume();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = type; osc.frequency.value = freq;
-        gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + dur);
-        osc.connect(gain); gain.connect(audioCtx.destination);
-        osc.start(); osc.stop(audioCtx.currentTime + dur);
+    play: (freq, type, dur, vol=0.3) => {
+        try {
+            const ctx = initAudio();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = type; 
+            osc.frequency.value = freq;
+            gain.gain.setValueAtTime(vol, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + dur);
+            osc.connect(gain); 
+            gain.connect(ctx.destination);
+            osc.start(); 
+            osc.stop(ctx.currentTime + dur);
+        } catch(e) {}
     },
-    correct: () => { sfx.play(440, 'sine', 0.1); setTimeout(() => sfx.play(659, 'sine', 0.2), 100); },
-    wrong: () => { sfx.play(250, 'sawtooth', 0.2); setTimeout(() => sfx.play(200, 'sawtooth', 0.3), 150); },
-    bossHit: () => { sfx.play(150, 'square', 0.1, 0.2); setTimeout(() => sfx.play(100, 'square', 0.2, 0.2), 50); },
-    bossHeal: () => { sfx.play(400, 'sine', 0.2); setTimeout(() => sfx.play(600, 'sine', 0.3), 100); },
-    win: () => { [523, 659, 783, 1046].forEach((f, i) => setTimeout(() => sfx.play(f, 'square', 0.2), i*150)); },
-    click: () => { sfx.play(600, 'sine', 0.05, 0.05); }
+    correct: () => { sfx.play(440, 'sine', 0.1, 0.4); setTimeout(() => sfx.play(659, 'sine', 0.2, 0.4), 100); },
+    wrong: () => { sfx.play(250, 'sawtooth', 0.2, 0.4); setTimeout(() => sfx.play(200, 'sawtooth', 0.3, 0.4), 150); },
+    bossHit: () => { sfx.play(150, 'square', 0.1, 0.5); setTimeout(() => sfx.play(100, 'square', 0.2, 0.5), 50); },
+    bossHeal: () => { sfx.play(400, 'sine', 0.2, 0.4); setTimeout(() => sfx.play(600, 'sine', 0.3, 0.4), 100); },
+    win: () => { [523, 659, 783, 1046].forEach((f, i) => setTimeout(() => sfx.play(f, 'square', 0.2, 0.4), i*150)); },
+    click: () => { sfx.play(600, 'sine', 0.05, 0.1); }
 };
 
 // ==========================================
