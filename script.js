@@ -210,17 +210,24 @@ const sfx = {
     play: (freq, type, dur, vol=0.3) => {
         try {
             const ctx = initAudio();
+            if (ctx.state === 'suspended') ctx.resume();
+            
             const osc = ctx.createOscillator();
             const gain = ctx.createGain();
             osc.type = type; 
-            osc.frequency.value = freq;
+            osc.frequency.setValueAtTime(freq, ctx.currentTime);
+            
             gain.gain.setValueAtTime(vol, ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + dur);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+            
             osc.connect(gain); 
             gain.connect(ctx.destination);
-            osc.start(); 
+            
+            osc.start(ctx.currentTime); 
             osc.stop(ctx.currentTime + dur);
-        } catch(e) {}
+        } catch(e) {
+            console.warn("Audio play failed:", e);
+        }
     },
     correct: () => { sfx.play(440, 'sine', 0.1, 0.4); setTimeout(() => sfx.play(659, 'sine', 0.2, 0.4), 100); },
     wrong: () => { sfx.play(250, 'sawtooth', 0.2, 0.4); setTimeout(() => sfx.play(200, 'sawtooth', 0.3, 0.4), 150); },
