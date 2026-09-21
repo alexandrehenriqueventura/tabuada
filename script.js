@@ -339,9 +339,7 @@ document.getElementById('btn-open-study').addEventListener('click', () => {
     studyGrid.innerHTML = '';
     for(let i = 1; i <= 10; i++) {
         const btn = document.createElement('div');
-        btn.classList.add('animal-option'); // Reaproveitar estilo de botão quadrado legal
-        btn.style.color = 'var(--text-light)';
-        btn.style.fontSize = '2.5rem';
+        btn.classList.add('study-number-btn');
         btn.textContent = i;
         btn.addEventListener('click', () => {
             sfx.click();

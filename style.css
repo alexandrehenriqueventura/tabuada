@@ -219,3 +219,21 @@ body {
     .login-title { font-size: 1.8rem; }
     .virtual-keyboard { gap: 8px; }
 }
+
+.study-number-btn {
+    background: var(--bg-card);
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--text-light);
+    font-size: 1.5rem;
+    font-weight: 800;
+    cursor: pointer;
+    aspect-ratio: 1;
+    transition: transform 0.1s;
+    border: 3px solid transparent;
+}
+.study-number-btn:active {
+    transform: scale(0.95);
+}
