@@ -61,19 +61,19 @@ body {
 .user-info { display: flex; flex-direction: column; }
 .user-name { font-weight: 800; font-size: 1.1rem; }
 .user-subtitle { font-size: 0.75rem; color: var(--gray-light); text-transform: uppercase; letter-spacing: 1px; }
-.stats-container { display: flex; gap: 12px; font-weight: 800; font-size: 1rem; }
+.stats-container { display: flex; gap: 8px; font-weight: 800; font-size: 1rem; }
 .stat { display: flex; align-items: center; gap: 4px; }
 
 /* Screens */
 .screen { flex: 1; display: flex; flex-direction: column; padding: 1rem; padding-bottom: 2.5rem; overflow-y: auto; }
 
 /* ANIMAL SELECT & OPERATION SELECT */
-.animal-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 2rem; }
+.animal-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 2rem; }
 .animal-option { background: var(--bg-card); border: 3px solid transparent; border-radius: 20px; aspect-ratio: 1; display: flex; justify-content: center; align-items: center; font-size: 4rem; color: var(--success); cursor: pointer; transition: transform 0.2s; }
 .animal-option.selected { border-color: var(--text-light); transform: scale(1.05); background: var(--gray-dark); box-shadow: 0 0 20px var(--success); }
 
-.operation-cards { display: flex; flex-direction: column; gap: 12px; margin-top: 1rem; }
-.op-card { background: var(--bg-card); padding: 1.2rem; border-radius: 16px; display: flex; align-items: center; gap: 15px; font-size: 1.3rem; font-weight: 800; cursor: pointer; transition: transform 0.1s; box-shadow: 0 4px 0 var(--gray-dark); }
+.operation-cards { display: flex; flex-direction: column; gap: 8px; margin-top: 1rem; }
+.op-card { background: var(--bg-card); padding: 1rem; border-radius: 16px; display: flex; align-items: center; gap: 10px; font-size: 1.3rem; font-weight: 800; cursor: pointer; transition: transform 0.1s; box-shadow: 0 4px 0 var(--gray-dark); }
 .op-card:active { transform: translateY(4px); box-shadow: none; }
 .op-card i { font-size: 1.8rem; width: 40px; text-align: center; }
 .op-card.mixed-card { background: linear-gradient(45deg, var(--bg-card), var(--gray-dark)); border: 2px dashed var(--purple); }
@@ -106,7 +106,7 @@ body {
 .map-node.boss { border-radius: 20px; width: 80px; background-color: var(--gray-dark); color: rgba(255,255,255,0.3); }
 
 /* TELA DE JOGO NORMAL */
-.game-top-bar { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 15px; margin-bottom: 2rem; }
+.game-top-bar { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 10px; margin-bottom: 2rem; }
 .quit-btn { background: transparent; border: none; color: var(--gray-light); font-size: 1.5rem; cursor: pointer; }
 .progress-bar-container { flex: 1; }
 .hearts-display { font-size: 1.2rem; font-weight: 800; display: flex; align-items: center; gap: 5px; }
@@ -121,7 +121,7 @@ body {
 #progress-fill, #assessment-progress-fill { height: 100%; background-color: var(--success); transition: width 0.3s; }
 .game-content { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; }
 .combo-text { font-size: 0.9rem; font-weight: 800; color: var(--gray-light); letter-spacing: 1px; transition: opacity 0.3s; }
-.question-container { font-size: 4rem; font-weight: 900; text-align: center; color: var(--text-light); display: flex; justify-content: center; gap: 15px; margin-bottom: 1.5rem; align-items: center; }
+.question-container { font-size: 4rem; font-weight: 900; text-align: center; color: var(--text-light); display: flex; justify-content: center; gap: 10px; margin-bottom: 1.5rem; align-items: center; }
 .inline-answer {
     display: inline-block;
     min-width: 80px; height: 80px; font-size: 4rem; text-align: center; line-height: 70px;
@@ -135,7 +135,7 @@ body {
 /* TELA DO CHEFÃO */
 #screen-boss { background-color: var(--bg-dark); }
 .boss-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; font-weight: 800;}
-.boss-name-container { display: flex; align-items: center; gap: 15px; }
+.boss-name-container { display: flex; align-items: center; gap: 10px; }
 .boss-timer { color: var(--secondary); font-size: 1.2rem; }
 
 .boss-arena { display: flex; flex-direction: column; align-items: center; width: 100%; }
@@ -149,7 +149,7 @@ body {
 
 /* VIRTUAL KEYBOARD */
 .virtual-keyboard {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 100%;
     max-width: 380px; margin: 0 auto; padding-bottom: 1rem;
 }
 .key {
@@ -199,14 +199,14 @@ body {
 #header-avatar { display: flex; justify-content: center; align-items: center; color: white; font-size: 1.5rem; }
 .avatar-preview-box { display: flex; justify-content: center; padding: 2rem 0; background: var(--gray-dark); border-radius: 16px; margin-bottom: 2rem; }
 .big-avatar { font-size: 6rem; color: var(--success); transition: color 0.3s; }
-.store-items { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+.store-items { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
 .store-item { background: var(--bg-card); padding: 1rem; border-radius: 16px; text-align: center; cursor: pointer; border: 3px solid transparent; }
 .store-item.owned { background: var(--gray-dark); opacity: 0.8; }
 .store-item.equipped { border-color: var(--primary); background: var(--gray-dark); }
 .item-price { font-weight: 800; color: var(--purple); margin-top: 5px; }
 
 /* BADGES / CONQUISTAS */
-.badges-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding-bottom: 2rem;}
+.badges-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding-bottom: 2rem;}
 .badge-slot { background: var(--gray-dark); border-radius: 50%; aspect-ratio: 1; display: flex; justify-content: center; align-items: center; font-size: 2rem; color: rgba(255,255,255,0.1); border: 2px dashed rgba(255,255,255,0.2); }
 .badge-slot.unlocked { background: var(--primary); color: var(--bg-dark); border: 4px solid var(--text-light); box-shadow: 0 0 15px var(--primary); }
 

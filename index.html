@@ -41,8 +41,8 @@
         <!-- TELA 0.6: Hub de Operações -->
         <section id="screen-operation-select" class="screen hidden">
             <div class="game-header">
-                <h3>Treinamento</h3>
-                <p style="color:var(--gray-light); font-size:0.8rem;">O que vamos treinar hoje?</p>
+                <h3 style="font-size: 2rem;">Treinamento</h3>
+                <p style="color:var(--gray-light); font-size:0.9rem;">O que vamos treinar hoje?</p>
             </div>
             <div class="operation-cards">
                 <div class="op-card" data-op="+">
@@ -66,8 +66,8 @@
                     <span>Modo Misto</span>
                 </div>
             </div>
-            <button class="primary-btn mt-2" id="btn-open-study" style="background:var(--primary); color:var(--bg-dark); margin-top: 1.5rem; border-radius: 16px;">
-                <i class="fa-solid fa-book-open"></i> Estudar Tabuada
+            <button class="primary-btn mt-2" id="btn-open-study" style="background:var(--primary); color:var(--bg-dark); margin-top: 1rem; border-radius: 16px;">
+                <i class="fa-solid fa-book-open"></i> ESTUDAR TABUADA
             </button>
         </section>
 
@@ -305,8 +305,8 @@
         <section id="screen-study-select" class="screen hidden">
             <div class="game-header" style="position:relative; margin-top:1rem;">
                 <button class="quit-btn" id="btn-back-study-hub" style="position:absolute; left:0; top:-5px; font-size:1.2rem; color:var(--text-light);"><i class="fa-solid fa-arrow-left"></i></button>
-                <h3>Modo Estudo</h3>
-                <p style="color:var(--gray-light); font-size:0.8rem;">O que você quer estudar?</p>
+                <h3 style="font-size: 2rem;">Modo Estudo</h3>
+                <p style="color:var(--gray-light); font-size:0.9rem;">O que você quer estudar?</p>
             </div>
             
             <div class="study-op-selector" style="display: flex; gap: 15px; justify-content: center; margin-top: 1.5rem; margin-bottom: 1.5rem;">
@@ -316,7 +316,7 @@
                 <button class="study-op-btn" data-op="/" style="background:var(--orange); color:white; border:none; padding:12px 18px; border-radius:12px; font-size:1.5rem; transition: transform 0.2s;"><i class="fa-solid fa-divide"></i></button>
             </div>
 
-            <div id="study-select-grid" style="display:grid; grid-template-columns:repeat(5, 1fr); gap:10px; flex:1;">
+            <div id="study-select-grid" style="display:grid; grid-template-columns:repeat(5, 1fr); gap:10px;">
                 <!-- Preenchido via JS -->
             </div>
         </section>
