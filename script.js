@@ -616,14 +616,16 @@ function startBossLevel() {
     
     document.getElementById('boss-name').textContent = activeLevelData.title;
     
-    const bIconContainer = document.getElementById('boss-icon-container');
-    const bossIconClass = activeLevelData.icon || 'fa-ghost';
-    bIconContainer.innerHTML = `<i class="fa-solid ${bossIconClass}"></i>`;
-    
-    if (bossIconClass === 'fa-robot') bIconContainer.style.color = 'var(--success)';
-    else if (bossIconClass === 'fa-ghost') bIconContainer.style.color = 'var(--purple)';
-    else if (bossIconClass === 'fa-dragon') bIconContainer.style.color = 'var(--danger)';
-    else bIconContainer.style.color = 'var(--orange)';
+    const bIcon = document.getElementById('boss-icon');
+    if (bIcon) {
+        const bossIconClass = activeLevelData.icon || 'fa-ghost';
+        bIcon.className = `fa-solid ${bossIconClass}`;
+        
+        if (bossIconClass === 'fa-robot') bIcon.style.color = 'var(--success)';
+        else if (bossIconClass === 'fa-ghost') bIcon.style.color = 'var(--purple)';
+        else if (bossIconClass === 'fa-dragon') bIcon.style.color = 'var(--danger)';
+        else bIcon.style.color = 'var(--orange)';
+    }
 
     bossTimeLeft = activeLevelData.time;
     updateBossHearts();
