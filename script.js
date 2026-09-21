@@ -314,6 +314,23 @@ document.getElementById('btn-back-hub').addEventListener('click', () => {
 // ==========================================
 // MODO ESTUDO (TABUADA LIVRE)
 // ==========================================
+let currentStudyOp = '*';
+
+document.querySelectorAll('.study-op-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        sfx.click();
+        document.querySelectorAll('.study-op-btn').forEach(b => {
+            b.style.border = 'none';
+            b.style.transform = 'scale(1)';
+            b.classList.remove('selected');
+        });
+        btn.style.border = '3px solid white';
+        btn.style.transform = 'scale(1.1)';
+        btn.classList.add('selected');
+        currentStudyOp = btn.dataset.op;
+    });
+});
+
 document.getElementById('btn-open-study').addEventListener('click', () => {
     sfx.click();
     
@@ -347,7 +364,9 @@ document.getElementById('btn-back-study-select').addEventListener('click', () =>
 });
 
 function openStudyView(num) {
-    document.getElementById('study-title').textContent = `Tabuada do ${num}`;
+    const opNames = {'+': 'Adição', '-': 'Subtração', '*': 'Multiplicação', '/': 'Divisão'};
+    document.getElementById('study-title').textContent = `${opNames[currentStudyOp]} do ${num}`;
+    
     const listContainer = document.getElementById('study-list-container');
     listContainer.innerHTML = '';
     
@@ -358,9 +377,20 @@ function openStudyView(num) {
         row.style.padding = '5px 0';
         row.style.borderBottom = '1px solid rgba(255, 255, 255, 0.2)';
         
+        let n1, n2, res, sym;
+        if (currentStudyOp === '+') {
+            n1 = num; n2 = i; sym = '+'; res = num + i;
+        } else if (currentStudyOp === '-') {
+            n1 = num + i; n2 = num; sym = '-'; res = i;
+        } else if (currentStudyOp === '*') {
+            n1 = num; n2 = i; sym = '×'; res = num * i;
+        } else if (currentStudyOp === '/') {
+            n1 = num * i; n2 = num; sym = '÷'; res = i;
+        }
+        
         row.innerHTML = `
-            <span style="color:var(--text-light);">${num} <span style="color:var(--primary); margin:0 5px;">×</span> ${i}</span>
-            <span style="color:var(--text-light);"><span style="color:var(--primary); margin:0 5px;">=</span> ${num * i}</span>
+            <span style="color:var(--text-light);">${n1} <span style="color:var(--primary); margin:0 5px;">${sym}</span> ${n2}</span>
+            <span style="color:var(--text-light);"><span style="color:var(--primary); margin:0 5px;">=</span> ${res}</span>
         `;
         listContainer.appendChild(row);
     }
