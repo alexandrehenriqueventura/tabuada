@@ -7,6 +7,8 @@ const screenGame = document.getElementById('screen-game');
 const screenBoss = document.getElementById('screen-boss');
 const screenWin = document.getElementById('screen-win');
 const screenLose = document.getElementById('screen-lose');
+const screenStudySelect = document.getElementById('screen-study-select');
+const screenStudyView = document.getElementById('screen-study-view');
 const globalHeader = document.getElementById('global-header');
 
 // Elementos de Login
@@ -138,10 +140,10 @@ function applyAvatarSettings() {
 // Configuração das Fases (Normal -> Boss sempre cumulativo)
 const levels = [];
 const opsInfo = [
-    { op: '+', name: 'Adição', boss: 'Rei da Adição' },
-    { op: '-', name: 'Subtração', boss: 'Ladrão de Números' },
-    { op: '*', name: 'Multiplicação', boss: 'O Guardião' },
-    { op: '/', name: 'Divisão', boss: 'O Fracionador' }
+    { op: '+', name: 'Adição', boss: 'Rei da Adição', icon: 'fa-robot' },
+    { op: '-', name: 'Subtração', boss: 'Ladrão Fantasma', icon: 'fa-ghost' },
+    { op: '*', name: 'Multiplicação', boss: 'Dragão Multiplicador', icon: 'fa-dragon' },
+    { op: '/', name: 'Divisão', boss: 'Aranha Fracionadora', icon: 'fa-spider' }
 ];
 
 let idCounter = 1;
@@ -156,6 +158,7 @@ for (const info of opsInfo) {
                 id: idCounter++,
                 type: 'boss',
                 op: info.op,
+                icon: info.icon,
                 min: 2,
                 max: 3 + stage,
                 time: 60,
@@ -307,6 +310,63 @@ document.getElementById('btn-back-hub').addEventListener('click', () => {
     sfx.click();
     showScreen(screenOperationSelect, true);
 });
+
+// ==========================================
+// MODO ESTUDO (TABUADA LIVRE)
+// ==========================================
+document.getElementById('btn-open-study').addEventListener('click', () => {
+    sfx.click();
+    
+    // Gerar grid 1 a 10
+    const studyGrid = document.getElementById('study-select-grid');
+    studyGrid.innerHTML = '';
+    for(let i = 1; i <= 10; i++) {
+        const btn = document.createElement('div');
+        btn.classList.add('animal-option'); // Reaproveitar estilo de botão quadrado legal
+        btn.style.color = 'var(--text-light)';
+        btn.style.fontSize = '2.5rem';
+        btn.textContent = i;
+        btn.addEventListener('click', () => {
+            sfx.click();
+            openStudyView(i);
+        });
+        studyGrid.appendChild(btn);
+    }
+    
+    showScreen(screenStudySelect, true);
+});
+
+document.getElementById('btn-back-study-hub').addEventListener('click', () => {
+    sfx.click();
+    showScreen(screenOperationSelect, true);
+});
+
+document.getElementById('btn-back-study-select').addEventListener('click', () => {
+    sfx.click();
+    showScreen(screenStudySelect, true);
+});
+
+function openStudyView(num) {
+    document.getElementById('study-title').textContent = `Tabuada do ${num}`;
+    const listContainer = document.getElementById('study-list-container');
+    listContainer.innerHTML = '';
+    
+    for(let i = 1; i <= 10; i++) {
+        const row = document.createElement('div');
+        row.style.display = 'flex';
+        row.style.justifyContent = 'space-between';
+        row.style.padding = '5px 0';
+        row.style.borderBottom = '1px solid var(--gray-dark)';
+        
+        row.innerHTML = `
+            <span>${num} <span style="color:var(--primary); margin:0 5px;">×</span> ${i}</span>
+            <span style="color:var(--success);">= ${num * i}</span>
+        `;
+        listContainer.appendChild(row);
+    }
+    
+    showScreen(screenStudyView, true);
+}
 
 // ==========================================
 // MAPA
@@ -553,6 +613,18 @@ function loseLife() {
 function startBossLevel() {
     bossLives = 3;
     currentPhaseTarget = 10; // Precisa acertar 10 para vencer
+    
+    document.getElementById('boss-name').textContent = activeLevelData.title;
+    
+    const bIconContainer = document.getElementById('boss-icon-container');
+    const bossIconClass = activeLevelData.icon || 'fa-ghost';
+    bIconContainer.innerHTML = `<i class="fa-solid ${bossIconClass}"></i>`;
+    
+    if (bossIconClass === 'fa-robot') bIconContainer.style.color = 'var(--success)';
+    else if (bossIconClass === 'fa-ghost') bIconContainer.style.color = 'var(--purple)';
+    else if (bossIconClass === 'fa-dragon') bIconContainer.style.color = 'var(--danger)';
+    else bIconContainer.style.color = 'var(--orange)';
+
     bossTimeLeft = activeLevelData.time;
     updateBossHearts();
     updateBossHealth();

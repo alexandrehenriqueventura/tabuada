@@ -287,14 +287,41 @@
             </div>
         </section>
 
-        <!-- TELA 5: Derrota -->
-        <section id="screen-lose" class="screen hidden">
-            <div class="win-content">
-                <div class="medal-container" style="background-color: var(--danger);"><i class="fa-solid fa-skull"></i></div>
-                <h2 class="win-title">Fim da Linha!</h2>
-                <p class="win-subtitle" id="lose-reason">Você está sem vidas. Volte amanhã!</p>
-                <button class="primary-btn mt-2" id="btn-buy-lives" style="background:var(--success); margin-bottom: 10px;"><i class="fa-solid fa-heart"></i> Restaurar Vidas (20 Gemas)</button>
-                <button class="primary-btn mt-2" id="btn-back-map-lose" style="background:var(--gray-dark);">Sair</button>
+        <!-- TELA DE DERROTA -->
+        <section id="screen-lose" class="screen hidden" style="justify-content: center; align-items: center; text-align: center;">
+            <div style="background: var(--danger); width: 100px; height: 100px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3rem; margin: 0 auto 1.5rem auto; box-shadow: 0 0 30px var(--danger);">
+                <i class="fa-solid fa-skull"></i>
+            </div>
+            <h2 class="win-title">Fim da Linha!</h2>
+            <p class="win-subtitle" id="lose-reason">Você está sem vidas. Volte amanhã!</p>
+            <button class="primary-btn mt-2" id="btn-buy-lives" style="background:var(--success); margin-bottom: 10px;"><i class="fa-solid fa-heart"></i> Restaurar Vidas (20 Gemas)</button>
+            <button class="primary-btn mt-2" id="btn-back-map-lose" style="background:var(--gray-dark);">Sair</button>
+        </section>
+
+        <!-- TELA DE SELECAO DE ESTUDO -->
+        <section id="screen-study-select" class="screen hidden">
+            <div class="game-top-bar">
+                <button class="quit-btn" id="btn-back-study-hub"><i class="fa-solid fa-arrow-left"></i></button>
+            </div>
+            <div class="game-header">
+                <h3>Estudar Tabuada</h3>
+                <p style="color:var(--gray-light); font-size:0.8rem;">Escolha qual número quer praticar</p>
+            </div>
+            <div id="study-select-grid" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin-top:1rem;">
+                <!-- Preenchido via JS -->
+            </div>
+        </section>
+
+        <!-- TELA DE VISAO DE ESTUDO -->
+        <section id="screen-study-view" class="screen hidden">
+            <div class="game-top-bar">
+                <button class="quit-btn" id="btn-back-study-select"><i class="fa-solid fa-arrow-left"></i></button>
+            </div>
+            <div class="game-header">
+                <h3 id="study-title">Tabuada do X</h3>
+            </div>
+            <div id="study-list-container" style="display:flex; flex-direction:column; gap:8px; margin-top:1rem; font-size: 1.5rem; font-weight:800; background:var(--bg-card); padding:1rem; border-radius:16px;">
+                <!-- Preenchido via JS -->
             </div>
         </section>
 
