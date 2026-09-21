@@ -60,58 +60,90 @@ const btnBackMapWin = document.getElementById('btn-back-map-win');
 const btnBackMapLose = document.getElementById('btn-back-map-lose');
 
 // ==========================================
-// ESTADO E LOCAL STORAGE
+// ESTADO E LOCAL STORAGE (FIREBASE)
 // ==========================================
-let currentUser = "";
-let isNewUser = false;
-let currentMode = "+"; // +, -, *, /, mixed
-let gameState = {
-    lives: 3,
-    gems: 0,
-    streak: 0,
-    maxLevelReached: 1, // Esse vai ser um array no futuro, mas por enquanto usamos como max global ou map individual
-    history: {},
-    inventory: ['green'], // Cores do avatar
-    equippedColor: 'green',
-    animalIcon: 'fa-dog'
+const firebaseConfig = {
+    apiKey: "AIzaSyBnubQM46SsuZUz2TncL4uyVhi0tVhH0gU",
+    authDomain: "tabuada-4b7d9.firebaseapp.com",
+    projectId: "tabuada-4b7d9",
+    storageBucket: "tabuada-4b7d9.firebasestorage.app",
+    messagingSenderId: "185531304834",
+    appId: "1:185531304834:web:a2b92e32991f34c49b5d9b",
+    measurementId: "G-QFZH57KLCF"
 };
 
-function saveProgress() {
+// Inicializa Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+let currentUser = "";
+let isNewUser = false;
+let currentMode = "+"; 
+let gameState = {
+    lives: 3, gems: 0, streak: 0, maxLevelReached: 1, 
+    history: {}, inventory: ['green'], equippedColor: 'green', animalIcon: 'fa-dog'
+};
+
+async function saveProgress() {
     if(!currentUser) return;
-    localStorage.setItem(`tabuada_user_${currentUser}`, JSON.stringify(gameState));
+    try {
+        await db.collection("users").doc(currentUser.toLowerCase()).set({
+            username: currentUser,
+            gameState: gameState,
+            lastUpdate: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+        
+        // Mantém backup local para jogar offline (PWA)
+        localStorage.setItem(`tabuada_user_${currentUser}`, JSON.stringify(gameState));
+    } catch (e) {
+        console.error("Erro ao salvar na nuvem, salvando localmente", e);
+        localStorage.setItem(`tabuada_user_${currentUser}`, JSON.stringify(gameState));
+    }
 }
 
-function loadProgress(username) {
-    const data = localStorage.getItem(`tabuada_user_${username}`);
+async function loadProgress(username) {
     const today = new Date().toDateString();
+    let dataLoaded = false;
     
-    if (data) {
-        gameState = JSON.parse(data);
-        
-        // Verifica se é um novo dia para restaurar as vidas
+    try {
+        const docRef = await db.collection("users").doc(username.toLowerCase()).get();
+        if (docRef.exists) {
+            gameState = docRef.data().gameState;
+            dataLoaded = true;
+        }
+    } catch(e) {
+        console.warn("Erro ao buscar na nuvem, tentando modo offline...");
+    }
+
+    // Fallback Offline
+    if (!dataLoaded) {
+        const localData = localStorage.getItem(`tabuada_user_${username}`);
+        if (localData) {
+            gameState = JSON.parse(localData);
+            dataLoaded = true;
+        }
+    }
+    
+    if (dataLoaded) {
         if (gameState.lastPlayedDate !== today) {
             gameState.lives = 3;
             gameState.lastPlayedDate = today;
         }
-        
         if (!gameState.history) gameState.history = {};
-        if (!gameState.inventory) {
-            gameState.inventory = ['green'];
-            gameState.equippedColor = 'green';
-            gameState.animalIcon = 'fa-dog';
-        }
+        if (!gameState.inventory) gameState.inventory = ['green'];
+        if (!gameState.equippedColor) gameState.equippedColor = 'green';
         if (!gameState.animalIcon) gameState.animalIcon = 'fa-dog';
         if (!gameState.lastPlayedDate) gameState.lastPlayedDate = today;
         
         isNewUser = false;
     } else {
-        // Novo usuario
-        gameState = { 
-            lives: 3, gems: 0, streak: 0, maxLevelReached: 1, 
-            history: {}, inventory: ['green'], equippedColor: 'green', 
-            animalIcon: 'fa-dog', lastPlayedDate: today 
-        };
+        // Novo usuário
         isNewUser = true;
+        gameState = {
+            lives: 3, gems: 0, streak: 0, maxLevelReached: 1,
+            history: {}, inventory: ['green'], equippedColor: 'green', 
+            animalIcon: 'fa-dog', lastPlayedDate: today
+        };
         saveProgress();
     }
     applyAvatarSettings();
@@ -264,12 +296,17 @@ function showScreen(screenEl, showHeader = true) {
 // ==========================================
 // LOGIN E NAVEGAÇÃO INICIAL
 // ==========================================
-loginForm.addEventListener('submit', (e) => {
+loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const name = usernameInput.value.trim();
     if(name) {
+        const btn = loginForm.querySelector('button');
+        const oldText = btn.textContent;
+        btn.textContent = 'Carregando...';
+        btn.disabled = true;
+
         currentUser = name;
-        loadProgress(currentUser);
+        await loadProgress(currentUser);
         updateGlobalUI();
         
         if (isNewUser) {
@@ -277,6 +314,9 @@ loginForm.addEventListener('submit', (e) => {
         } else {
             showScreen(screenOperationSelect, true);
         }
+        
+        btn.textContent = oldText;
+        btn.disabled = false;
     }
 });
 

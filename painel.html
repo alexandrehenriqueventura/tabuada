@@ -3,85 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel do Professor - Tabuada</title>
-    <link rel="stylesheet" href="painel.css">
+    <title>Painel do Professor - Tabuada Adventure</title>
+    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+    <style>
+        body { padding: 20px; max-width: 800px; margin: 0 auto; background-color: var(--bg-dark); }
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 2px solid var(--gray-dark); padding-bottom: 1rem; }
+        .student-card { background: var(--bg-card); padding: 15px; border-radius: 12px; margin-bottom: 15px; }
+        .student-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed var(--gray-dark); padding-bottom: 10px; margin-bottom: 10px; }
+        .student-name { font-size: 1.5rem; font-weight: bold; text-transform: capitalize; color: var(--text-light); }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 10px; }
+        .stat-box { background: var(--gray-dark); padding: 10px; border-radius: 8px; text-align: center; }
+        .stat-box span { font-weight: bold; font-size: 1.2rem; }
+        
+        .deficiencies-box { background: rgba(255, 60, 60, 0.1); border: 1px solid var(--danger); padding: 10px; border-radius: 8px; margin-top: 10px; }
+        .deficiencies-box h4 { margin: 0 0 5px 0; color: var(--danger); }
+        .def-tag { display: inline-block; background: var(--danger); color: white; padding: 3px 8px; border-radius: 12px; font-size: 0.8rem; margin: 2px; font-weight: bold;}
+    </style>
 </head>
 <body>
-    <div class="dashboard-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <h2><i class="fa-solid fa-graduation-cap"></i> EduPanel</h2>
-            </div>
-            <nav class="sidebar-nav">
-                <a href="#" class="active"><i class="fa-solid fa-chart-line"></i> Visão Geral</a>
-                <a href="#"><i class="fa-solid fa-users"></i> Minhas Turmas</a>
-                <a href="#"><i class="fa-solid fa-user-graduate"></i> Alunos</a>
-                <a href="index.html" class="back-app"><i class="fa-solid fa-gamepad"></i> Voltar ao App</a>
-            </nav>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="main-content">
-            <header class="top-header">
-                <h1>Painel de Controle - Visão Geral</h1>
-                <div class="teacher-profile">
-                    <span>Prof. Alexandre</span>
-                    <div class="avatar"></div>
-                </div>
-            </header>
-
-            <!-- Cards de Resumo -->
-            <section class="summary-cards">
-                <div class="card">
-                    <div class="card-icon" style="background-color: #e0f2fe; color: #0284c7;"><i class="fa-solid fa-users"></i></div>
-                    <div class="card-info">
-                        <h3>Total de Alunos</h3>
-                        <p id="total-students">0</p>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-icon" style="background-color: #dcfce7; color: #16a34a;"><i class="fa-solid fa-check-circle"></i></div>
-                    <div class="card-info">
-                        <h3>Fases Concluídas</h3>
-                        <p id="total-completed">0</p>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-icon" style="background-color: #fee2e2; color: #dc2626;"><i class="fa-solid fa-triangle-exclamation"></i></div>
-                    <div class="card-info">
-                        <h3>Alertas (Dificuldade)</h3>
-                        <p>2</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Tabela de Alunos -->
-            <section class="students-section">
-                <div class="section-header">
-                    <h2>Desempenho dos Alunos (Turma A)</h2>
-                    <button class="primary-btn-sm"><i class="fa-solid fa-plus"></i> Adicionar Aluno</button>
-                </div>
-                
-                <table class="students-table">
-                    <thead>
-                        <tr>
-                            <th>Nome do Aluno</th>
-                            <th>Fase Atual</th>
-                            <th>Ofensiva (Dias)</th>
-                            <th>Gemas Coletadas</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="students-tbody">
-                        <!-- Gerado via JS -->
-                    </tbody>
-                </table>
-            </section>
-        </main>
+    <div class="dashboard-header">
+        <h2><i class="fa-solid fa-chart-line text-primary"></i> Painel do Professor</h2>
+        <a href="index.html" class="primary-btn" style="text-decoration:none; padding:10px 20px;"><i class="fa-solid fa-gamepad"></i> Voltar pro Jogo</a>
     </div>
+
+    <div id="loading" style="text-align:center; padding: 50px;">
+        <i class="fa-solid fa-spinner fa-spin fa-3x text-primary"></i>
+        <p>Buscando dados dos alunos...</p>
+    </div>
+
+    <div id="students-list"></div>
 
     <script src="painel.js"></script>
 </body>

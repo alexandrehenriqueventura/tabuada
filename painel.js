@@ -1,46 +1,89 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const tbody = document.getElementById('students-tbody');
-    const totalStudentsEl = document.getElementById('total-students');
-    const totalCompletedEl = document.getElementById('total-completed');
+const firebaseConfig = {
+    apiKey: "AIzaSyBnubQM46SsuZUz2TncL4uyVhi0tVhH0gU",
+    authDomain: "tabuada-4b7d9.firebaseapp.com",
+    projectId: "tabuada-4b7d9",
+    storageBucket: "tabuada-4b7d9.firebasestorage.app",
+    messagingSenderId: "185531304834",
+    appId: "1:185531304834:web:a2b92e32991f34c49b5d9b"
+};
 
-    let studentsCount = 0;
-    let phasesCompletedCount = 0;
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-    // Busca no LocalStorage
-    for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key.startsWith('tabuada_user_')) {
-            const username = key.replace('tabuada_user_', '');
-            const data = JSON.parse(localStorage.getItem(key));
-            
-            studentsCount++;
-            phasesCompletedCount += (data.maxLevelReached - 1);
-
-            let statusHtml = '';
-            if (data.lives === 0) {
-                statusHtml = '<span class="status-badge status-warning">Sem Energia</span>';
-            } else if (data.streak >= 3) {
-                statusHtml = '<span class="status-badge status-good">Em chamas 🔥</span>';
-            } else {
-                statusHtml = '<span class="status-badge status-good">Regular</span>';
-            }
-
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${username}</td>
-                <td>Nível ${data.maxLevelReached}</td>
-                <td><i class="fa-solid fa-fire" style="color:#f97316;"></i> ${data.streak}</td>
-                <td><i class="fa-solid fa-gem" style="color:#a855f7;"></i> ${data.gems}</td>
-                <td>${statusHtml}</td>
-            `;
-            tbody.appendChild(tr);
+async function loadDashboard() {
+    const studentsList = document.getElementById('students-list');
+    const loading = document.getElementById('loading');
+    
+    try {
+        const snapshot = await db.collection('users').get();
+        loading.style.display = 'none';
+        
+        if (snapshot.empty) {
+            studentsList.innerHTML = "<p>Nenhum aluno encontrado ainda.</p>";
+            return;
         }
-    }
 
-    if (studentsCount === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#64748b;">Nenhum aluno cadastrado ainda. Peça para que eles acessem o app e criem um perfil!</td></tr>`;
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            const state = data.gameState || {};
+            
+            // Analisa as maiores deficiências
+            let deficienciesHtml = '';
+            if (state.history) {
+                // Filtra apenas contas que o aluno errou mais de 2 vezes, ou que errou mais do que acertou
+                const errors = [];
+                for (const [key, stats] of Object.entries(state.history)) {
+                    if (stats.wrong >= 2 && stats.wrong >= (stats.correct * 0.5)) {
+                        errors.push({ key, wrong: stats.wrong });
+                    }
+                }
+                
+                if (errors.length > 0) {
+                    // Ordena pelos que mais errou
+                    errors.sort((a, b) => b.wrong - a.wrong);
+                    
+                    const tags = errors.map(e => `<span class="def-tag">${e.key} (${e.wrong} erros)</span>`).join('');
+                    deficienciesHtml = `
+                        <div class="deficiencies-box">
+                            <h4><i class="fa-solid fa-triangle-exclamation"></i> Precisa de Atenção:</h4>
+                            ${tags}
+                        </div>
+                    `;
+                }
+            }
+            
+            const card = document.createElement('div');
+            card.className = 'student-card';
+            card.innerHTML = `
+                <div class="student-header">
+                    <div class="student-name"><i class="fa-solid ${state.animalIcon || 'fa-user'}"></i> ${data.username}</div>
+                    <div style="color:var(--gray-light); font-size:0.8rem;">
+                        Último acesso: ${state.lastPlayedDate || 'Desconhecido'}
+                    </div>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div style="color:var(--gray-light); font-size:0.8rem;">Fase Max</div>
+                        <span class="text-primary">${state.maxLevelReached || 1}</span>
+                    </div>
+                    <div class="stat-box">
+                        <div style="color:var(--gray-light); font-size:0.8rem;">Gemas</div>
+                        <span class="text-secondary"><i class="fa-solid fa-bolt"></i> ${state.gems || 0}</span>
+                    </div>
+                    <div class="stat-box">
+                        <div style="color:var(--gray-light); font-size:0.8rem;">Ofensiva</div>
+                        <span class="text-orange"><i class="fa-solid fa-medal"></i> ${state.streak || 0} dias</span>
+                    </div>
+                </div>
+                ${deficienciesHtml}
+            `;
+            studentsList.appendChild(card);
+        });
+        
+    } catch(e) {
+        console.error(e);
+        loading.innerHTML = `<p style="color:red;">Erro ao buscar dados: ${e.message}</p>`;
     }
+}
 
-    totalStudentsEl.textContent = studentsCount;
-    totalCompletedEl.textContent = phasesCompletedCount;
-});
+document.addEventListener('DOMContentLoaded', loadDashboard);
