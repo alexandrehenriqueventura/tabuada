@@ -356,11 +356,11 @@ function openStudyView(num) {
         row.style.display = 'flex';
         row.style.justifyContent = 'space-between';
         row.style.padding = '5px 0';
-        row.style.borderBottom = '1px solid var(--gray-dark)';
+        row.style.borderBottom = '1px solid rgba(255, 255, 255, 0.2)';
         
         row.innerHTML = `
-            <span>${num} <span style="color:var(--primary); margin:0 5px;">×</span> ${i}</span>
-            <span style="color:var(--success);">= ${num * i}</span>
+            <span style="color:var(--text-light);">${num} <span style="color:var(--primary); margin:0 5px;">×</span> ${i}</span>
+            <span style="color:var(--text-light);"><span style="color:var(--primary); margin:0 5px;">=</span> ${num * i}</span>
         `;
         listContainer.appendChild(row);
     }
