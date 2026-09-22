@@ -75,6 +75,10 @@ const firebaseConfig = {
 // Inicializa Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+const auth = firebase.auth();
+let currentDisplayName = "";
+let currentEmail = "";
+
 
 let currentUser = "";
 let isNewUser = false;
@@ -87,8 +91,9 @@ let gameState = {
 async function saveProgress() {
     if(!currentUser) return;
     try {
-        await db.collection("users").doc(currentUser.toLowerCase()).set({
-            username: currentUser,
+        await db.collection("users").doc(currentUser).set({
+            username: currentDisplayName || currentUser,
+            email: currentEmail || "",
             gameState: gameState,
             lastUpdate: firebase.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
@@ -106,7 +111,7 @@ async function loadProgress(username) {
     let dataLoaded = false;
     
     try {
-        const docRef = await db.collection("users").doc(username.toLowerCase()).get();
+        const docRef = await db.collection("users").doc(username).get();
         if (docRef.exists) {
             gameState = docRef.data().gameState;
             dataLoaded = true;
@@ -277,7 +282,7 @@ function updateGlobalUI() {
     globalGemsEl.textContent = gameState.gems;
     globalStreakEl.textContent = gameState.streak;
     headerPhaseNum.textContent = gameState.maxLevelReached;
-    displayUsername.textContent = currentUser;
+    displayUsername.textContent = (currentDisplayName || currentUser).split(" ")[0];
     
     const currentLvl = levels.find(l => l.id === gameState.maxLevelReached) || levels[levels.length-1];
     phaseTitleCard.textContent = currentLvl.title;
@@ -296,16 +301,40 @@ function showScreen(screenEl, showHeader = true) {
 // ==========================================
 // LOGIN E NAVEGAÇÃO INICIAL
 // ==========================================
-loginForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const name = usernameInput.value.trim();
-    if(name) {
-        const btn = loginForm.querySelector('button');
-        const oldText = btn.textContent;
-        btn.textContent = 'Carregando...';
-        btn.disabled = true;
+const btnGoogleLogin = document.getElementById('btn-google-login');
+const loginLoadingMsg = document.getElementById('login-loading-msg');
 
-        currentUser = name;
+btnGoogleLogin.addEventListener('click', async () => {
+    sfx.click();
+    const provider = new firebase.auth.GoogleAuthProvider();
+    btnGoogleLogin.disabled = true;
+    loginLoadingMsg.classList.remove('hidden');
+    
+    try {
+        await auth.signInWithPopup(provider);
+        // O restante será tratado pelo onAuthStateChanged abaixo
+    } catch(error) {
+        console.error("Erro no login com Google:", error);
+        alert("Ocorreu um erro ao fazer login. Tente novamente.");
+        btnGoogleLogin.disabled = false;
+        loginLoadingMsg.classList.add('hidden');
+    }
+});
+
+auth.onAuthStateChanged(async (user) => {
+    if (user) {
+        // Usuário logado!
+        btnGoogleLogin.disabled = true;
+        loginLoadingMsg.classList.remove('hidden');
+        loginLoadingMsg.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Bem-vindo, ${user.displayName.split(' ')[0]}! Carregando...`;
+
+        currentUser = user.uid;
+        currentDisplayName = user.displayName;
+        currentEmail = user.email;
+
+        // Atualiza o display name da tela global
+        displayUsername.textContent = currentDisplayName.split(' ')[0];
+
         await loadProgress(currentUser);
         updateGlobalUI();
         
@@ -314,9 +343,11 @@ loginForm.addEventListener('submit', async (e) => {
         } else {
             showScreen(screenOperationSelect, true);
         }
-        
-        btn.textContent = oldText;
-        btn.disabled = false;
+    } else {
+        // Usuário deslogado
+        btnGoogleLogin.disabled = false;
+        loginLoadingMsg.classList.add('hidden');
+        showScreen(document.getElementById('screen-login'), false);
     }
 });
 

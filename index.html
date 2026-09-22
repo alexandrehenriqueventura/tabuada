@@ -7,6 +7,8 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+
 
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0b0f19">
@@ -20,15 +22,19 @@
 <body>
     <div id="app-container">
         <!-- TELA 0: Login -->
-        <section id="screen-login" class="screen active">
-            <div class="login-content">
-                <i class="fa-solid fa-gamepad login-icon"></i>
-                <h1 class="login-title">Bem-vindo à Tabuada!</h1>
-                <p class="login-subtitle">Qual é o seu nome, aventureiro?</p>
-                <form id="login-form">
-                    <input type="text" id="username-input" placeholder="Digite seu nome..." required autocomplete="off">
-                    <button type="submit" class="primary-btn mt-2">Começar Aventura</button>
-                </form>
+        <section id="screen-login" class="screen active" style="justify-content: center;">
+            <div class="login-content" style="text-align: center;">
+                <i class="fa-solid fa-gamepad login-icon" style="font-size: 5rem; color: var(--primary); margin-bottom: 20px;"></i>
+                <h1 class="login-title" style="font-size: 2.5rem; margin-bottom: 10px;">Tabuada Adventure</h1>
+                <p class="login-subtitle" style="color: var(--gray-light); margin-bottom: 30px;">Aprenda brincando e salve seu progresso na nuvem!</p>
+                
+                <div id="login-form">
+                    <button id="btn-google-login" type="button" class="primary-btn" style="background-color: white; color: #333; display: flex; align-items: center; justify-content: center; gap: 12px; font-size: 1.2rem; padding: 15px 20px;">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" width="24" height="24" alt="Google Logo">
+                        Entrar com o Google
+                    </button>
+                    <p id="login-loading-msg" class="hidden" style="margin-top: 15px; color: var(--primary); font-weight: bold;"><i class="fa-solid fa-spinner fa-spin"></i> Conectando...</p>
+                </div>
             </div>
         </section>
 
