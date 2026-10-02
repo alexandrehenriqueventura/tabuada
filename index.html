@@ -145,16 +145,29 @@
 
         <!-- TELA: Loja / Avatar -->
         <section id="screen-store" class="screen hidden">
-            <div class="game-header">
-                <h3>Personalizar Personagem</h3>
-                <button class="close-btn" id="close-store"><i class="fa-solid fa-xmark"></i></button>
+            <div class="game-header" style="position:relative; margin-top:0.5rem;">
+                <button class="quit-btn" id="close-store" style="position:absolute; right:0; top:-5px; font-size:1.5rem; color:var(--text-light);"><i class="fa-solid fa-xmark"></i></button>
+                <h3 style="font-size: 1.8rem; margin-bottom: 2px;">Crie seu Herói!</h3>
+                <p style="color:var(--gray-light); font-size:0.85rem; text-align: center;">Use gemas para liberar roupas e acessórios</p>
             </div>
-            <div class="avatar-preview-box">
-                <div id="big-avatar" class="big-avatar">
-                    <i class="fa-solid fa-user-astronaut"></i>
+
+            <!-- BOX DE PRÉ-VISUALIZAÇÃO DO BONECO -->
+            <div class="avatar-preview-box" style="display:flex; justify-content:center; align-items:center; background: rgba(0,0,0,0.25); border-radius: 20px; padding: 1rem; margin-top: 0.8rem; border: 2px dashed rgba(255,255,255,0.15);">
+                <div id="big-avatar-container" style="width: 130px; height: 130px; display: flex; justify-content: center; align-items: center;">
+                    <!-- SVG do Boneco Gerado via JS -->
                 </div>
             </div>
-            <div class="store-items" id="store-items-container">
+
+            <!-- ABAS DA LOJA -->
+            <div class="store-tabs" style="display: flex; gap: 6px; justify-content: center; margin-top: 1rem; margin-bottom: 0.8rem; width: 100%;">
+                <button class="store-tab-btn active" data-tab="skin" style="background: var(--primary); color: var(--bg-dark); border: none; padding: 8px 10px; border-radius: 12px; font-weight: 900; font-size: 0.8rem; cursor: pointer; flex: 1;"><i class="fa-solid fa-user"></i> Pele</button>
+                <button class="store-tab-btn" data-tab="hair" style="background: var(--gray-dark); color: white; border: none; padding: 8px 10px; border-radius: 12px; font-weight: 900; font-size: 0.8rem; cursor: pointer; flex: 1;"><i class="fa-solid fa-scissors"></i> Cabelo</button>
+                <button class="store-tab-btn" data-tab="clothing" style="background: var(--gray-dark); color: white; border: none; padding: 8px 10px; border-radius: 12px; font-weight: 900; font-size: 0.8rem; cursor: pointer; flex: 1;"><i class="fa-solid fa-shirt"></i> Roupa</button>
+                <button class="store-tab-btn" data-tab="accessory" style="background: var(--gray-dark); color: white; border: none; padding: 8px 10px; border-radius: 12px; font-weight: 900; font-size: 0.8rem; cursor: pointer; flex: 1;"><i class="fa-solid fa-glasses"></i> Extra</button>
+            </div>
+
+            <!-- ITENS DA LOJA -->
+            <div class="store-items" id="store-items-container" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; overflow-y: auto; max-height: 240px; padding-right: 4px;">
                 <!-- Itens gerados via JS -->
             </div>
         </section>
@@ -299,7 +312,9 @@
                     <div class="chat-bubble">Naããão!</div>
                     <i class="fa-solid fa-ghost"></i>
                 </div>
-                <div class="medal-container"><i class="fa-solid fa-medal"></i></div>
+                <div id="win-avatar-container" style="width: 100px; height: 100px; margin-bottom: 1rem; display: flex; justify-content: center; align-items: center; filter: drop-shadow(0 0 15px var(--primary));">
+                    <!-- SVG do Boneco Gerado via JS -->
+                </div>
                 <div class="boss-tag" id="win-tag"><i class="fa-solid fa-star"></i> Fase Vencida</div>
                 <h2 class="win-title" id="win-title-text">Fase Concluída!</h2>
                 <div class="win-stats-card">

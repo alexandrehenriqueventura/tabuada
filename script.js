@@ -129,15 +129,30 @@ async function loadProgress(username) {
         }
     }
     
+const defaultAvatar = {
+    skin: 'skin-1',
+    hair: 'hair-short',
+    clothing: 'shirt-basic',
+    accessory: 'acc-none'
+};
+
+const defaultInventory = [
+    'skin-1', 'skin-2', 'skin-3',
+    'hair-short', 'hair-curly',
+    'shirt-basic',
+    'acc-none'
+];
+
     if (dataLoaded) {
         if (gameState.lastPlayedDate !== today) {
             gameState.lives = 3;
             gameState.lastPlayedDate = today;
         }
         if (!gameState.history) gameState.history = {};
-        if (!gameState.inventory) gameState.inventory = ['green'];
-        if (!gameState.equippedColor) gameState.equippedColor = 'green';
-        if (!gameState.animalIcon) gameState.animalIcon = 'fa-dog';
+        if (!gameState.avatar) gameState.avatar = {...defaultAvatar};
+        if (!gameState.inventory || !Array.isArray(gameState.inventory) || gameState.inventory.includes('green')) {
+            gameState.inventory = [...defaultInventory];
+        }
         if (!gameState.lastPlayedDate) gameState.lastPlayedDate = today;
         
         isNewUser = false;
@@ -146,31 +161,162 @@ async function loadProgress(username) {
         isNewUser = true;
         gameState = {
             lives: 3, gems: 0, streak: 0, maxLevelReached: 1,
-            history: {}, inventory: ['green'], equippedColor: 'green', 
-            animalIcon: 'fa-dog', lastPlayedDate: today
+            history: {}, inventory: [...defaultInventory], avatar: {...defaultAvatar},
+            lastPlayedDate: today
         };
         saveProgress();
     }
     applyAvatarSettings();
 }
 
-function applyAvatarSettings() {
-    const colorMap = {
-        'green': 'var(--success)',
-        'blue': 'var(--secondary)',
-        'red': 'var(--danger)',
-        'purple': 'var(--purple)',
-        'yellow': 'var(--primary)'
+function generateAvatarSVG(avatar = {}, size = 100) {
+    const skinMap = {
+        'skin-1': '#fcd34d',
+        'skin-2': '#f59e0b',
+        'skin-3': '#854d0e',
+        'skin-4': '#38bdf8',
+        'skin-5': '#4ade80'
     };
-    const c = colorMap[gameState.equippedColor] || 'var(--success)';
     
-    document.getElementById('header-avatar').style.backgroundColor = c;
-    document.getElementById('header-avatar').innerHTML = `<i class="fa-solid ${gameState.animalIcon}"></i>`;
+    const skinColor = skinMap[avatar.skin] || skinMap['skin-1'];
+    const hair = avatar.hair || 'hair-short';
+    const clothing = avatar.clothing || 'shirt-basic';
+    const accessory = avatar.accessory || 'acc-none';
+
+    let svg = `<svg width="${size}" height="${size}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">`;
     
-    const bigAv = document.getElementById('big-avatar');
-    if (bigAv) {
-        bigAv.style.color = c;
-        bigAv.innerHTML = `<i class="fa-solid ${gameState.animalIcon}"></i>`;
+    svg += `
+        <defs>
+            <linearGradient id="gradFire" x1="0%" y1="100%" x2="0%" y2="0%">
+                <stop offset="0%" stop-color="#ef4444" />
+                <stop offset="100%" stop-color="#facc15" />
+            </linearGradient>
+            <linearGradient id="gradKnight" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#cbd5e1" />
+                <stop offset="100%" stop-color="#475569" />
+            </linearGradient>
+        </defs>
+    `;
+
+    // 1. NECK & SHIRT
+    svg += `<rect x="43" y="62" width="14" height="12" fill="${skinColor}" rx="3" />`;
+
+    if (clothing === 'shirt-basic') {
+        svg += `<path d="M 24 82 Q 50 72 76 82 L 80 100 L 20 100 Z" fill="#ef4444" />`;
+        svg += `<path d="M 42 75 Q 50 80 58 75" stroke="#ffffff" stroke-width="2" fill="none" />`;
+    } else if (clothing === 'shirt-hero') {
+        svg += `<path d="M 24 82 Q 50 72 76 82 L 80 100 L 20 100 Z" fill="#2563eb" />`;
+        svg += `<polygon points="50,78 52,83 57,83 53,86 55,91 50,88 45,91 47,86 43,83 48,83" fill="#facc15" />`;
+    } else if (clothing === 'shirt-wizard') {
+        svg += `<path d="M 22 80 Q 50 70 78 80 L 82 100 L 18 100 Z" fill="#7c3aed" />`;
+        svg += `<circle cx="35" cy="88" r="1.5" fill="#facc15" /><circle cx="65" cy="86" r="2" fill="#facc15" /><circle cx="50" cy="92" r="1.5" fill="#ffffff" />`;
+    } else if (clothing === 'shirt-school') {
+        svg += `<path d="M 24 82 Q 50 72 76 82 L 80 100 L 20 100 Z" fill="#059669" />`;
+        svg += `<polygon points="47,75 53,75 51,92 49,92" fill="#ef4444" />`;
+    } else if (clothing === 'shirt-knight') {
+        svg += `<path d="M 22 80 Q 50 70 78 80 L 82 100 L 18 100 Z" fill="url(#gradKnight)" />`;
+        svg += `<path d="M 50 74 L 50 96" stroke="#1e293b" stroke-width="2" />`;
+        svg += `<circle cx="50" cy="85" r="4" fill="#ef4444" />`;
+    }
+
+    // 2. HEAD BASE & EARS
+    svg += `<circle cx="50" cy="45" r="24" fill="${skinColor}" />`;
+    svg += `<circle cx="25" cy="45" r="4.5" fill="${skinColor}" />`;
+    svg += `<circle cx="75" cy="45" r="4.5" fill="${skinColor}" />`;
+
+    // 3. FACE EXPRESSION
+    svg += `<ellipse cx="40" cy="43" rx="3.5" ry="4.5" fill="#1e293b" />`;
+    svg += `<ellipse cx="60" cy="43" rx="3.5" ry="4.5" fill="#1e293b" />`;
+    svg += `<circle cx="41.5" cy="41.5" r="1.3" fill="#ffffff" />`;
+    svg += `<circle cx="61.5" cy="41.5" r="1.3" fill="#ffffff" />`;
+    svg += `<ellipse cx="33" cy="48" rx="3.5" ry="2" fill="#f472b6" opacity="0.65" />`;
+    svg += `<ellipse cx="67" cy="48" rx="3.5" ry="2" fill="#f472b6" opacity="0.65" />`;
+    svg += `<path d="M 43 50 Q 50 56 57 50" stroke="#1e293b" stroke-width="2.2" fill="none" stroke-linecap="round" />`;
+
+    // 4. HAIR LAYER
+    if (hair === 'hair-short') {
+        svg += `<path d="M 25 43 Q 24 21 50 21 Q 76 21 75 43 Q 66 31 50 33 Q 34 31 25 43 Z" fill="#334155" />`;
+    } else if (hair === 'hair-curly') {
+        svg += `
+            <circle cx="32" cy="27" r="9" fill="#1e293b" />
+            <circle cx="44" cy="22" r="10" fill="#1e293b" />
+            <circle cx="56" cy="22" r="10" fill="#1e293b" />
+            <circle cx="68" cy="27" r="9" fill="#1e293b" />
+            <circle cx="26" cy="36" r="8" fill="#1e293b" />
+            <circle cx="74" cy="36" r="8" fill="#1e293b" />
+        `;
+    } else if (hair === 'hair-long') {
+        svg += `
+            <path d="M 23 45 Q 23 18 50 18 Q 77 18 77 45 L 79 65 Q 73 65 74 45 Q 65 28 50 30 Q 35 28 26 45 Q 27 65 21 65 Z" fill="#ca8a04" />
+        `;
+    } else if (hair === 'hair-spiky-fire') {
+        svg += `
+            <path d="M 25 40 Q 20 25 35 20 Q 30 10 48 5 Q 52 15 62 10 Q 70 20 75 40 Q 64 30 50 32 Q 36 30 25 40 Z" fill="url(#gradFire)" />
+        `;
+    }
+
+    // 5. ACCESSORY LAYER
+    if (accessory === 'acc-glasses') {
+        svg += `
+            <rect x="31" y="37" width="16" height="12" rx="3" fill="rgba(56,189,248,0.25)" stroke="#1e293b" stroke-width="2.5" />
+            <rect x="53" y="37" width="16" height="12" rx="3" fill="rgba(56,189,248,0.25)" stroke="#1e293b" stroke-width="2.5" />
+            <line x1="47" y1="42" x2="53" y2="42" stroke="#1e293b" stroke-width="2.5" />
+            <line x1="25" y1="42" x2="31" y2="42" stroke="#1e293b" stroke-width="2" />
+            <line x1="69" y1="42" x2="75" y2="42" stroke="#1e293b" stroke-width="2" />
+        `;
+    } else if (accessory === 'acc-sunglasses') {
+        svg += `
+            <path d="M 30 37 L 47 37 L 45 49 L 32 49 Z" fill="#0f172a" />
+            <path d="M 53 37 L 70 37 L 68 49 L 55 49 Z" fill="#0f172a" />
+            <line x1="47" y1="40" x2="53" y2="40" stroke="#0f172a" stroke-width="3" />
+            <line x1="24" y1="40" x2="30" y2="40" stroke="#0f172a" stroke-width="2.5" />
+            <line x1="70" y1="40" x2="76" y2="40" stroke="#0f172a" stroke-width="2.5" />
+        `;
+    } else if (accessory === 'acc-crown') {
+        svg += `
+            <polygon points="30,24 35,10 42,18 50,6 58,18 65,10 70,24" fill="#facc15" stroke="#ca8a04" stroke-width="1.5" />
+            <rect x="30" y="24" width="40" height="5" fill="#eab308" />
+            <circle cx="50" cy="12" r="2" fill="#ef4444" />
+            <circle cx="35" cy="15" r="1.5" fill="#3b82f6" />
+            <circle cx="65" cy="15" r="1.5" fill="#10b981" />
+        `;
+    } else if (accessory === 'acc-wizard-hat') {
+        svg += `
+            <path d="M 18 26 Q 50 20 82 26 Q 50 24 18 26 Z" fill="#4338ca" />
+            <path d="M 30 24 Q 50 -10 68 5 Q 60 16 70 24 Z" fill="#6366f1" />
+            <rect x="33" y="21" width="34" height="4" fill="#facc15" />
+            <polygon points="50,18 52,22 56,22 53,24 54,28 50,25 46,28 47,24 44,22 48,22" fill="#ffffff" />
+        `;
+    } else if (accessory === 'acc-headphones') {
+        svg += `
+            <path d="M 24 45 A 27 27 0 0 1 76 45" fill="none" stroke="#ec4899" stroke-width="4.5" stroke-linecap="round" />
+            <rect x="20" y="38" width="8" height="15" rx="3" fill="#38bdf8" />
+            <rect x="72" y="38" width="8" height="15" rx="3" fill="#38bdf8" />
+        `;
+    } else if (accessory === 'acc-bow') {
+        svg += `
+            <polygon points="62,22 74,16 70,26" fill="#f472b6" />
+            <polygon points="62,22 74,28 70,18" fill="#f472b6" />
+            <circle cx="62" cy="22" r="3" fill="#fb7185" />
+        `;
+    }
+
+    svg += `</svg>`;
+    return svg;
+}
+
+function applyAvatarSettings() {
+    if (!gameState.avatar) gameState.avatar = {...defaultAvatar};
+    
+    const headerAvatar = document.getElementById('header-avatar');
+    if (headerAvatar) {
+        headerAvatar.style.backgroundColor = 'transparent';
+        headerAvatar.innerHTML = generateAvatarSVG(gameState.avatar, 40);
+    }
+    
+    const bigAvContainer = document.getElementById('big-avatar-container');
+    if (bigAvContainer) {
+        bigAvContainer.innerHTML = generateAvatarSVG(gameState.avatar, 130);
     }
 }
 
@@ -1077,6 +1223,11 @@ function winLevel() {
         gameState.streak++; // Ganha ofensiva
     }
     
+    const winAv = document.getElementById('win-avatar-container');
+    if (winAv) {
+        winAv.innerHTML = generateAvatarSVG(gameState.avatar, 100);
+    }
+
     saveProgress();
     updateGlobalUI();
     showScreen(screenWin, false);
@@ -1211,59 +1362,132 @@ function finishAssessment() {
 }
 
 // ==========================================
-// LOJA / CUSTOMIZAÇÃO
+// LOJA / CUSTOMIZAÇÃO DO BONECO
 // ==========================================
 const screenStore = document.getElementById('screen-store');
 const btnStore = document.getElementById('btn-store');
 const closeStore = document.getElementById('close-store');
 const storeItemsContainer = document.getElementById('store-items-container');
 
-const shopItems = [
-    { id: 'blue', type: 'color', name: 'Azul Espacial', price: 50 },
-    { id: 'red', type: 'color', name: 'Vermelho Fogo', price: 50 },
-    { id: 'purple', type: 'color', name: 'Roxo Místico', price: 100 },
-    { id: 'yellow', type: 'color', name: 'Amarelo Relâmpago', price: 150 }
+const avatarStoreCatalog = [
+    // PELES
+    { id: 'skin-1', cat: 'skin', name: 'Tom Dourado', price: 0, preview: '#fcd34d' },
+    { id: 'skin-2', cat: 'skin', name: 'Tom Tan', price: 0, preview: '#f59e0b' },
+    { id: 'skin-3', cat: 'skin', name: 'Tom Castanho', price: 0, preview: '#854d0e' },
+    { id: 'skin-4', cat: 'skin', name: 'Azul Estelar', price: 30, preview: '#38bdf8' },
+    { id: 'skin-5', cat: 'skin', name: 'Verde Alien', price: 30, preview: '#4ade80' },
+
+    // CABELOS
+    { id: 'hair-short', cat: 'hair', name: 'Curto Espetado', price: 0, icon: 'fa-scissors' },
+    { id: 'hair-curly', cat: 'hair', name: 'Cabelo Cacheado', price: 0, icon: 'fa-user' },
+    { id: 'hair-long', cat: 'hair', name: 'Liso com Franja', price: 25, icon: 'fa-wand-magic' },
+    { id: 'hair-spiky-fire', cat: 'hair', name: 'Super Flamejante', price: 50, icon: 'fa-fire' },
+
+    // ROUPAS
+    { id: 'shirt-basic', cat: 'clothing', name: 'Camiseta Padrão', price: 0, icon: 'fa-shirt' },
+    { id: 'shirt-school', cat: 'clothing', name: 'Uniforme Escolar', price: 25, icon: 'fa-graduation-cap' },
+    { id: 'shirt-hero', cat: 'clothing', name: 'Traje de Herói', price: 40, icon: 'fa-shield-halved' },
+    { id: 'shirt-wizard', cat: 'clothing', name: 'Manto de Mago', price: 60, icon: 'fa-wand-sparkles' },
+    { id: 'shirt-knight', cat: 'clothing', name: 'Armadura Real', price: 80, icon: 'fa-chess-knight' },
+
+    // ACESSÓRIOS
+    { id: 'acc-none', cat: 'accessory', name: 'Sem Acessório', price: 0, icon: 'fa-xmark' },
+    { id: 'acc-glasses', cat: 'accessory', name: 'Óculos Nerd', price: 20, icon: 'fa-glasses' },
+    { id: 'acc-sunglasses', cat: 'accessory', name: 'Óculos de Sol', price: 35, icon: 'fa-glasses' },
+    { id: 'acc-headphones', cat: 'accessory', name: 'Fone Gamer', price: 45, icon: 'fa-headphones' },
+    { id: 'acc-wizard-hat', cat: 'accessory', name: 'Chapéu de Mago', price: 60, icon: 'fa-hat-wizard' },
+    { id: 'acc-crown', cat: 'accessory', name: 'Coroa de Ouro', price: 100, icon: 'fa-crown' }
 ];
 
-btnStore.addEventListener('click', () => { renderStore(); showScreen(screenStore); });
-closeStore.addEventListener('click', () => { showScreen(screenMap); });
+let activeStoreTab = 'skin';
+
+document.querySelectorAll('.store-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        sfx.click();
+        document.querySelectorAll('.store-tab-btn').forEach(b => {
+            b.classList.remove('active');
+            b.style.background = 'var(--gray-dark)';
+            b.style.color = 'white';
+        });
+        btn.classList.add('active');
+        btn.style.background = 'var(--primary)';
+        btn.style.color = 'var(--bg-dark)';
+        activeStoreTab = btn.dataset.tab;
+        renderStore();
+    });
+});
+
+btnStore.addEventListener('click', () => {
+    sfx.click();
+    renderStore();
+    applyAvatarSettings();
+    showScreen(screenStore);
+});
+
+closeStore.addEventListener('click', () => {
+    sfx.click();
+    showScreen(screenMap);
+});
 
 function renderStore() {
     storeItemsContainer.innerHTML = '';
-    shopItems.forEach(item => {
+    applyAvatarSettings();
+
+    const filteredItems = avatarStoreCatalog.filter(i => i.cat === activeStoreTab);
+
+    filteredItems.forEach(item => {
         const isOwned = gameState.inventory.includes(item.id);
-        const isEquipped = gameState.equippedColor === item.id;
+        const isEquipped = gameState.avatar && gameState.avatar[item.cat] === item.id;
         
         const div = document.createElement('div');
         div.className = `store-item ${isOwned ? 'owned' : ''} ${isEquipped ? 'equipped' : ''}`;
-        
+        div.style.background = 'var(--bg-card)';
+        div.style.padding = '12px';
+        div.style.borderRadius = '16px';
+        div.style.textAlign = 'center';
+        div.style.cursor = 'pointer';
+        div.style.border = isEquipped ? '3px solid white' : (isOwned ? '3px solid var(--gray-dark)' : '3px solid transparent');
+        div.style.opacity = (isOwned || isEquipped) ? '1' : '0.85';
+
+        let iconOrPreview = '';
+        if (item.preview) {
+            iconOrPreview = `<div style="width:24px; height:24px; border-radius:50%; background:${item.preview}; margin:0 auto 6px auto; border:2px solid white;"></div>`;
+        } else {
+            iconOrPreview = `<i class="fa-solid ${item.icon || 'fa-star'}" style="font-size:1.5rem; margin-bottom:6px; display:block;"></i>`;
+        }
+
         let actionHtml = '';
-        if (isEquipped) actionHtml = `<p class="item-price" style="color:var(--success)">Equipado</p>`;
-        else if (isOwned) actionHtml = `<p class="item-price" style="color:var(--gray-light)">Adquirido</p>`;
-        else actionHtml = `<p class="item-price"><i class="fa-solid fa-gem"></i> ${item.price}</p>`;
+        if (isEquipped) actionHtml = `<p class="item-price" style="color:white; font-weight:900; margin-top:4px;"><i class="fa-solid fa-circle-check"></i> Equipado</p>`;
+        else if (isOwned) actionHtml = `<p class="item-price" style="color:var(--gray-light); font-weight:800; margin-top:4px;">No Armário</p>`;
+        else actionHtml = `<p class="item-price" style="color:var(--purple); font-weight:900; margin-top:4px;"><i class="fa-solid fa-gem"></i> ${item.price}</p>`;
         
         div.innerHTML = `
-            <h4>${item.name}</h4>
+            ${iconOrPreview}
+            <h4 style="font-size:0.95rem; font-weight:900;">${item.name}</h4>
             ${actionHtml}
         `;
         
         div.addEventListener('click', () => {
             if (isEquipped) return;
             if (isOwned) {
-                gameState.equippedColor = item.id;
+                sfx.click();
+                gameState.avatar[item.cat] = item.id;
                 saveProgress();
                 applyAvatarSettings();
                 renderStore();
             } else if (gameState.gems >= item.price) {
+                sfx.win();
                 gameState.gems -= item.price;
                 gameState.inventory.push(item.id);
-                gameState.equippedColor = item.id;
+                gameState.avatar[item.cat] = item.id;
                 saveProgress();
                 applyAvatarSettings();
                 updateGlobalUI();
                 renderStore();
+                alert(`Parabéns! Você adquiriu: ${item.name}! 🎉`);
             } else {
-                alert('Gemas insuficientes!');
+                sfx.wrong();
+                alert(`Gemas insuficientes! Você precisa de ${item.price} gemas para comprar ${item.name}.`);
             }
         });
         
