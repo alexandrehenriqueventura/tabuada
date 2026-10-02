@@ -475,6 +475,163 @@ function openStudyView(num) {
 }
 
 // ==========================================
+// MODO SELEÇÃO DE TREINO (CUSTOMIZADO)
+// ==========================================
+const screenCustomSelect = document.getElementById('screen-custom-select');
+let customSelectedOps = ['+', '-', '*', '/'];
+let customSelectedNums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+const btnOpenCustomPractice = document.getElementById('btn-open-custom-practice');
+if (btnOpenCustomPractice) {
+    btnOpenCustomPractice.addEventListener('click', () => {
+        sfx.click();
+        initCustomSelectScreen();
+        showScreen(screenCustomSelect, true);
+    });
+}
+
+const btnBackCustomHub = document.getElementById('btn-back-custom-hub');
+if (btnBackCustomHub) {
+    btnBackCustomHub.addEventListener('click', () => {
+        sfx.click();
+        showScreen(screenOperationSelect, true);
+    });
+}
+
+function initCustomSelectScreen() {
+    // Operações
+    document.querySelectorAll('.custom-op-btn').forEach(btn => {
+        const op = btn.dataset.op;
+        if (customSelectedOps.includes(op)) {
+            btn.classList.add('active');
+            btn.style.opacity = '1';
+            btn.style.border = '3px solid white';
+            btn.style.transform = 'scale(1)';
+        } else {
+            btn.classList.remove('active');
+            btn.style.opacity = '0.35';
+            btn.style.border = '3px solid transparent';
+            btn.style.transform = 'scale(0.95)';
+        }
+    });
+
+    // Números Grid
+    const numsGrid = document.getElementById('custom-nums-grid');
+    if (numsGrid) {
+        numsGrid.innerHTML = '';
+        for (let i = 1; i <= 10; i++) {
+            const btn = document.createElement('div');
+            btn.classList.add('study-number-btn');
+            btn.textContent = i;
+            btn.dataset.num = i;
+            
+            if (customSelectedNums.includes(i)) {
+                btn.classList.add('active');
+                btn.style.opacity = '1';
+                btn.style.border = '3px solid white';
+                btn.style.background = 'var(--purple)';
+            } else {
+                btn.classList.remove('active');
+                btn.style.opacity = '0.35';
+                btn.style.border = '3px solid transparent';
+                btn.style.background = 'var(--gray-dark)';
+            }
+
+            btn.addEventListener('click', () => {
+                sfx.click();
+                const num = parseInt(btn.dataset.num);
+                if (customSelectedNums.includes(num)) {
+                    if (customSelectedNums.length > 1) {
+                        customSelectedNums = customSelectedNums.filter(n => n !== num);
+                        btn.classList.remove('active');
+                        btn.style.opacity = '0.35';
+                        btn.style.border = '3px solid transparent';
+                        btn.style.background = 'var(--gray-dark)';
+                    }
+                } else {
+                    customSelectedNums.push(num);
+                    btn.classList.add('active');
+                    btn.style.opacity = '1';
+                    btn.style.border = '3px solid white';
+                    btn.style.background = 'var(--purple)';
+                }
+                updateToggleAllBtn();
+            });
+
+            numsGrid.appendChild(btn);
+        }
+    }
+    updateToggleAllBtn();
+}
+
+// Toggle operacoes
+document.querySelectorAll('.custom-op-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        sfx.click();
+        const op = btn.dataset.op;
+        if (customSelectedOps.includes(op)) {
+            if (customSelectedOps.length > 1) {
+                customSelectedOps = customSelectedOps.filter(o => o !== op);
+                btn.classList.remove('active');
+                btn.style.opacity = '0.35';
+                btn.style.border = '3px solid transparent';
+                btn.style.transform = 'scale(0.95)';
+            }
+        } else {
+            customSelectedOps.push(op);
+            btn.classList.add('active');
+            btn.style.opacity = '1';
+            btn.style.border = '3px solid white';
+            btn.style.transform = 'scale(1)';
+        }
+    });
+});
+
+const toggleAllBtn = document.getElementById('btn-toggle-all-nums');
+if (toggleAllBtn) {
+    toggleAllBtn.addEventListener('click', () => {
+        sfx.click();
+        if (customSelectedNums.length === 10) {
+            customSelectedNums = [1];
+        } else {
+            customSelectedNums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+        }
+        initCustomSelectScreen();
+    });
+}
+
+function updateToggleAllBtn() {
+    if (toggleAllBtn) {
+        if (customSelectedNums.length === 10) {
+            toggleAllBtn.textContent = "Desmarcar Todos";
+        } else {
+            toggleAllBtn.textContent = "Selecionar Todos";
+        }
+    }
+}
+
+const btnStartCustomGame = document.getElementById('btn-start-custom-game');
+if (btnStartCustomGame) {
+    btnStartCustomGame.addEventListener('click', () => {
+        sfx.click();
+        if (customSelectedOps.length === 0 || customSelectedNums.length === 0) {
+            alert("Escolha pelo menos 1 operação e 1 número!");
+            return;
+        }
+        
+        const customLevelData = {
+            type: 'normal',
+            op: 'custom',
+            isCustom: true,
+            targetScore: 10,
+            title: 'Seleção de Treino',
+            desc: 'Treino Personalizado'
+        };
+        startLevel(customLevelData);
+    });
+}
+
+// ==========================================
 // MAPA
 // ==========================================
 function renderMap() {
@@ -622,28 +779,54 @@ function generateNormalQuestion() {
     let newStr = "";
     
     do {
-        op = activeLevelData.op === 'mixed' ? ['+', '-', '*', '/'][getRandomInt(0, 3)] : (activeLevelData.op || '*');
-        
-        // Repetição Espaçada: 30% de chance de forçar uma conta que o aluno mais errou
-        const mistakes = Object.entries(gameState.history || {}).filter(([k, v]) => v.wrong > v.correct && k.includes(op));
-        
-        if (mistakes.length > 0 && Math.random() < 0.3) {
-            const randomMistake = mistakes[Math.floor(Math.random() * mistakes.length)][0];
-            const parts = randomMistake.split(op);
-            n1 = parseInt(parts[0]);
-            n2 = parseInt(parts[1]);
-        } else {
-            if (op === '/') {
-                n2 = activeLevelData.table;
-                let res = getRandomInt(2, 9);
-                n1 = n2 * res;
-            } else if (op === '-') {
-                n2 = activeLevelData.table;
-                n1 = getRandomInt(n2, n2 + 9);
-            } else {
-                n1 = activeLevelData.table;
-                n2 = getRandomInt(2, 9);
+        if (activeLevelData.op === 'custom' || activeLevelData.isCustom) {
+            const validOps = customSelectedOps.length > 0 ? customSelectedOps : ['*'];
+            const validNums = customSelectedNums.length > 0 ? customSelectedNums : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+            
+            op = validOps[getRandomInt(0, validOps.length - 1)];
+            const chosenNum = validNums[getRandomInt(0, validNums.length - 1)];
+            
+            if (op === '+') {
+                n1 = chosenNum;
+                n2 = getRandomInt(1, 10);
                 if (Math.random() > 0.5) [n1, n2] = [n2, n1];
+            } else if (op === '-') {
+                n2 = chosenNum;
+                let res = getRandomInt(1, 10);
+                n1 = n2 + res;
+            } else if (op === '*') {
+                n1 = chosenNum;
+                n2 = getRandomInt(1, 10);
+                if (Math.random() > 0.5) [n1, n2] = [n2, n1];
+            } else if (op === '/') {
+                n2 = chosenNum;
+                let res = getRandomInt(1, 10);
+                n1 = n2 * res;
+            }
+        } else {
+            op = activeLevelData.op === 'mixed' ? ['+', '-', '*', '/'][getRandomInt(0, 3)] : (activeLevelData.op || '*');
+            
+            // Repetição Espaçada: 30% de chance de forçar uma conta que o aluno mais errou
+            const mistakes = Object.entries(gameState.history || {}).filter(([k, v]) => v.wrong > v.correct && k.includes(op));
+            
+            if (mistakes.length > 0 && Math.random() < 0.3) {
+                const randomMistake = mistakes[Math.floor(Math.random() * mistakes.length)][0];
+                const parts = randomMistake.split(op);
+                n1 = parseInt(parts[0]);
+                n2 = parseInt(parts[1]);
+            } else {
+                if (op === '/') {
+                    n2 = activeLevelData.table;
+                    let res = getRandomInt(2, 9);
+                    n1 = n2 * res;
+                } else if (op === '-') {
+                    n2 = activeLevelData.table;
+                    n1 = getRandomInt(n2, n2 + 9);
+                } else {
+                    n1 = activeLevelData.table;
+                    n2 = getRandomInt(2, 9);
+                    if (Math.random() > 0.5) [n1, n2] = [n2, n1];
+                }
             }
         }
         newStr = `${n1}${op}${n2}`;
@@ -872,31 +1055,52 @@ function updateBossHearts() {
 // ==========================================
 function winLevel() {
     sfx.win();
-    const gemsReward = (activeLevelData.type === 'boss') ? 10 : 5;
-    document.getElementById('win-title-text').textContent = (activeLevelData.type === 'boss') ? 'Chefão Derrotado!' : 'Fase Concluída!';
+    const isCustom = activeLevelData && activeLevelData.isCustom;
+    const gemsReward = (activeLevelData.type === 'boss') ? 10 : (isCustom ? 10 : 5);
+    
+    if (activeLevelData.type === 'boss') {
+        document.getElementById('win-title-text').textContent = 'Chefão Derrotado!';
+    } else if (isCustom) {
+        document.getElementById('win-title-text').textContent = 'Treino Concluído!';
+    } else {
+        document.getElementById('win-title-text').textContent = 'Fase Concluída!';
+    }
+
     document.getElementById('win-correct').textContent = currentPhaseTarget;
     document.getElementById('win-total').textContent = currentPhaseTarget;
     document.getElementById('win-gems').textContent = gemsReward;
     
     gameState.gems += gemsReward;
     
-    if (activeLevelData.visualPhaseId === gameState.maxLevelReached) {
+    if (!isCustom && activeLevelData.visualPhaseId === gameState.maxLevelReached) {
         gameState.maxLevelReached++;
         gameState.streak++; // Ganha ofensiva
     }
     
-    document.getElementById('win-total').textContent = currentPhaseTarget;
-    
+    saveProgress();
     updateGlobalUI();
     showScreen(screenWin, false);
 }
 
-btnBackMapWin.addEventListener('click', () => { renderMap(); showScreen(screenMap, true); });
+btnBackMapWin.addEventListener('click', () => { 
+    sfx.click();
+    if (activeLevelData && activeLevelData.isCustom) {
+        showScreen(screenCustomSelect, true);
+    } else {
+        renderMap(); 
+        showScreen(screenMap, true);
+    }
+});
+
 btnBackMapLose.addEventListener('click', () => { 
-    if (gameState.lives <= 0) {
+    sfx.click();
+    if (activeLevelData && activeLevelData.isCustom) {
+        showScreen(screenCustomSelect, true);
+    } else if (gameState.lives <= 0) {
         showScreen(screenOperationSelect, true); 
     } else {
-        renderMap(); showScreen(screenMap, true);
+        renderMap(); 
+        showScreen(screenMap, true);
     }
 });
 

@@ -81,9 +81,14 @@
                     <span>Modo Misto</span>
                 </div>
             </div>
-            <button class="primary-btn mt-2" id="btn-open-study" style="background:var(--primary); color:var(--bg-dark); margin-top: 1rem; border-radius: 16px;">
-                <i class="fa-solid fa-book-open"></i> ESTUDAR TABUADA
-            </button>
+            <div style="display: flex; gap: 10px; margin-top: 1rem; width: 100%;">
+                <button class="primary-btn" id="btn-open-study" style="background:var(--primary); color:var(--bg-dark); border-radius: 16px; flex: 1; padding: 14px 8px; font-size: 0.95rem; font-weight: 900; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                    <i class="fa-solid fa-book-open"></i> MODO ESTUDO
+                </button>
+                <button class="primary-btn" id="btn-open-custom-practice" style="background:var(--purple); color:white; border-radius: 16px; flex: 1; padding: 14px 8px; font-size: 0.95rem; font-weight: 900; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                    <i class="fa-solid fa-sliders"></i> SELEÇÃO DE TREINO
+                </button>
+            </div>
         </section>
 
         <!-- Cabeçalho Global -->
@@ -345,6 +350,48 @@
             <div id="study-list-container" style="display:flex; flex-direction:column; gap:8px; margin-top:1.5rem; font-size: 1.5rem; font-weight:800; background:var(--bg-card); padding:1rem 1.5rem; border-radius:16px;">
                 <!-- Preenchido via JS -->
             </div>
+        </section>
+
+        <!-- TELA DE SELEÇÃO DE TREINO (MODO CUSTOMIZADO) -->
+        <section id="screen-custom-select" class="screen hidden">
+            <div class="game-header" style="position:relative; margin-top:0.5rem;">
+                <button class="quit-btn" id="btn-back-custom-hub" style="position:absolute; left:0; top:-5px; font-size:1.2rem; color:var(--text-light);"><i class="fa-solid fa-arrow-left"></i></button>
+                <h3 style="font-size: 1.8rem; margin-bottom: 4px;">Seleção de Treino</h3>
+                <p style="color:var(--gray-light); font-size:0.85rem; text-align: center;">Escolha as operações e números para praticar!</p>
+            </div>
+
+            <!-- SEÇÃO 1: OPERAÇÕES -->
+            <div style="margin-top: 1.2rem;">
+                <label style="font-size: 0.9rem; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 10px;">
+                    <i class="fa-solid fa-calculator"></i> 1. Operações:
+                </label>
+                <div id="custom-ops-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+                    <button class="custom-op-btn active" data-op="+" style="background: var(--success); color: white; border: 3px solid white; padding: 12px 0; border-radius: 14px; font-size: 1.5rem; font-weight: 900; cursor: pointer; transition: all 0.2s;">+</button>
+                    <button class="custom-op-btn active" data-op="-" style="background: var(--danger); color: white; border: 3px solid white; padding: 12px 0; border-radius: 14px; font-size: 1.5rem; font-weight: 900; cursor: pointer; transition: all 0.2s;">-</button>
+                    <button class="custom-op-btn active" data-op="*" style="background: var(--secondary); color: white; border: 3px solid white; padding: 12px 0; border-radius: 14px; font-size: 1.5rem; font-weight: 900; cursor: pointer; transition: all 0.2s;">×</button>
+                    <button class="custom-op-btn active" data-op="/" style="background: var(--orange); color: white; border: 3px solid white; padding: 12px 0; border-radius: 14px; font-size: 1.5rem; font-weight: 900; cursor: pointer; transition: all 0.2s;">÷</button>
+                </div>
+            </div>
+
+            <!-- SEÇÃO 2: NÚMEROS DA TABUADA -->
+            <div style="margin-top: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <label style="font-size: 0.9rem; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 1px;">
+                        <i class="fa-solid fa-list-ol"></i> 2. Números da Tabuada:
+                    </label>
+                    <button id="btn-toggle-all-nums" style="background: rgba(255,255,255,0.1); border: 1px solid var(--gray-light); color: white; padding: 4px 10px; border-radius: 10px; font-size: 0.75rem; font-weight: 800; cursor: pointer;">
+                        Desmarcar Todos
+                    </button>
+                </div>
+                <div id="custom-nums-grid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;">
+                    <!-- Preenchido via JS (1 a 10) -->
+                </div>
+            </div>
+
+            <!-- BOTÃO INICIAR TREINO -->
+            <button class="primary-btn" id="btn-start-custom-game" style="margin-top: 2rem; background: var(--success); color: white; border-radius: 16px;">
+                <i class="fa-solid fa-play"></i> INICIAR TREINO
+            </button>
         </section>
 
     </div>

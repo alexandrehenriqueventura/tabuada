@@ -78,11 +78,16 @@ body {
 .op-card i { font-size: 1.8rem; width: 40px; text-align: center; }
 .op-card.mixed-card { background: linear-gradient(45deg, var(--bg-card), var(--gray-dark)); border: 2px dashed var(--purple); }
 
+#screen-map {
+    padding-top: 0;
+}
+
 /* Mapa */
 .phase-card {
     background-color: var(--bg-card); border-radius: 20px; padding: 1.5rem;
     display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;
-    position: sticky; top: 0; z-index: 10; box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    position: sticky; top: 0; z-index: 20; box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    margin-top: 0.5rem;
 }
 .phase-subtitle { font-size: 0.7rem; font-weight: 800; opacity: 0.9; }
 .phase-title { font-size: 1.8rem; font-weight: 900; margin: 5px 0; }
