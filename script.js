@@ -1553,3 +1553,137 @@ function renderBadges() {
         badgesContainer.appendChild(wrapper);
     });
 }
+
+// ==========================================
+// RANKING DOS HERÓIS (LEADERBOARD)
+// ==========================================
+const screenLeaderboard = document.getElementById('screen-leaderboard');
+const btnLeaderboard = document.getElementById('btn-leaderboard');
+const closeLeaderboard = document.getElementById('close-leaderboard');
+const leaderboardListContainer = document.getElementById('leaderboard-list-container');
+
+let activeLeaderboardType = 'streak';
+
+if (btnLeaderboard) {
+    btnLeaderboard.addEventListener('click', () => {
+        sfx.click();
+        renderLeaderboard();
+        showScreen(screenLeaderboard, false);
+    });
+}
+
+if (closeLeaderboard) {
+    closeLeaderboard.addEventListener('click', () => {
+        sfx.click();
+        renderMap();
+        showScreen(screenMap, true);
+    });
+}
+
+document.querySelectorAll('.lb-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        sfx.click();
+        document.querySelectorAll('.lb-tab-btn').forEach(b => {
+            b.classList.remove('active');
+            b.style.background = 'var(--gray-dark)';
+            b.style.color = 'white';
+        });
+        btn.classList.add('active');
+        btn.style.background = 'var(--primary)';
+        btn.style.color = 'var(--bg-dark)';
+        activeLeaderboardType = btn.dataset.type;
+        renderLeaderboard();
+    });
+});
+
+async function renderLeaderboard() {
+    leaderboardListContainer.innerHTML = '<p style="text-align:center; color:var(--primary); padding:2rem; font-weight:800;"><i class="fa-solid fa-spinner fa-spin"></i> Carregando Ranking...</p>';
+    
+    let usersList = [];
+
+    try {
+        if (typeof firebase !== 'undefined' && firebase.firestore) {
+            const snapshot = await firebase.firestore().collection("users").get();
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                if (data) {
+                    const state = data.gameState || {};
+                    usersList.push({
+                        name: data.username || 'Aventureiro',
+                        avatar: state.avatar || defaultAvatar,
+                        streak: state.streak || 0,
+                        maxLevel: state.maxLevelReached || 1,
+                        gems: state.gems || 0
+                    });
+                }
+            });
+        }
+    } catch(e) {
+        console.warn("Erro ao buscar ranking no Firestore:", e);
+    }
+
+    if (usersList.length === 0) {
+        usersList.push({
+            name: (currentDisplayName || currentUser || 'Você').split(' ')[0],
+            avatar: gameState.avatar || defaultAvatar,
+            streak: gameState.streak || 0,
+            maxLevel: gameState.maxLevelReached || 1,
+            gems: gameState.gems || 0
+        });
+    }
+
+    // Ordenação
+    if (activeLeaderboardType === 'streak') {
+        usersList.sort((a, b) => b.streak - a.streak);
+    } else if (activeLeaderboardType === 'phase') {
+        usersList.sort((a, b) => b.maxLevel - a.maxLevel);
+    } else if (activeLeaderboardType === 'gems') {
+        usersList.sort((a, b) => b.gems - a.gems);
+    }
+
+    leaderboardListContainer.innerHTML = '';
+
+    const medals = ['🥇', '🥈', '🥉'];
+
+    usersList.forEach((user, index) => {
+        const div = document.createElement('div');
+        div.style.display = 'flex';
+        div.style.alignItems = 'center';
+        div.style.justifyContent = 'space-between';
+        div.style.background = 'var(--bg-card)';
+        div.style.padding = '10px 14px';
+        div.style.borderRadius = '16px';
+        div.style.border = '2px solid rgba(255,255,255,0.15)';
+        div.style.boxShadow = '0 4px 10px rgba(0,0,0,0.2)';
+
+        const rankIcon = medals[index] || `${index + 1}º`;
+        const avatarSvg = generateAvatarSVG(user.avatar, 38);
+
+        let valueDisplay = '';
+        if (activeLeaderboardType === 'streak') {
+            valueDisplay = `<i class="fa-solid fa-fire text-orange"></i> ${user.streak}d`;
+        } else if (activeLeaderboardType === 'phase') {
+            valueDisplay = `<i class="fa-solid fa-medal text-secondary"></i> Fase ${user.maxLevel}`;
+        } else if (activeLeaderboardType === 'gems') {
+            valueDisplay = `<i class="fa-solid fa-gem text-purple"></i> ${user.gems}`;
+        }
+
+        div.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 1.2rem; font-weight: 900; width: 26px; text-align: center;">${rankIcon}</span>
+                <div style="width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.2);">
+                    ${avatarSvg}
+                </div>
+                <div style="display: flex; flex-direction: column;">
+                    <span style="font-weight: 900; font-size: 0.95rem; color: white;">${user.name}</span>
+                    <span style="font-size: 0.75rem; color: rgba(255,255,255,0.8);">Fase ${user.maxLevel} • ${user.gems} gemas</span>
+                </div>
+            </div>
+            <div style="font-weight: 900; font-size: 1rem; color: var(--primary); display: flex; align-items: center; gap: 4px;">
+                ${valueDisplay}
+            </div>
+        `;
+
+        leaderboardListContainer.appendChild(div);
+    });
+}

@@ -242,3 +242,23 @@ body {
 .study-number-btn:active {
     transform: scale(0.95);
 }
+
+/* ANIMAÇÕES E BRILHOS PARA ITENS RAROS DO AVATAR */
+@keyframes crownGlow {
+    0%, 100% { filter: drop-shadow(0 0 4px #facc15) drop-shadow(0 0 10px rgba(250, 204, 21, 0.6)); }
+    50% { filter: drop-shadow(0 0 8px #fef08a) drop-shadow(0 0 18px rgba(250, 204, 21, 0.95)); }
+}
+
+@keyframes fireGlow {
+    0%, 100% { filter: drop-shadow(0 -3px 6px #ef4444); transform: translateY(0); }
+    50% { filter: drop-shadow(0 -5px 12px #f97316); transform: translateY(-1px); }
+}
+
+@keyframes wizardSparkle {
+    0%, 100% { filter: drop-shadow(0 0 5px #a855f7); }
+    50% { filter: drop-shadow(0 0 12px #c084fc); }
+}
+
+.sparkle-crown { animation: crownGlow 2.5s ease-in-out infinite; }
+.sparkle-fire { animation: fireGlow 1.8s ease-in-out infinite; }
+.sparkle-wizard { animation: wizardSparkle 2.2s ease-in-out infinite; }

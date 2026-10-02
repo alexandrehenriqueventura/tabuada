@@ -117,6 +117,7 @@
                 </div>
             </div>
             <div class="stats-container">
+                <div class="stat" id="btn-leaderboard" style="cursor:pointer;" title="Ranking dos Alunos"><i class="fa-solid fa-trophy text-yellow"></i></div>
                 <div class="stat" id="btn-badges" style="cursor:pointer;"><i class="fa-solid fa-medal text-secondary"></i></div>
                 <div class="stat" id="btn-store" style="cursor:pointer;"><i class="fa-solid fa-store text-success"></i></div>
                 <div class="stat"><i class="fa-solid fa-fire text-orange"></i> <span id="global-streak">0</span></div>
@@ -423,6 +424,25 @@
             <button class="primary-btn" id="btn-start-custom-game" style="margin-top: 2rem; background: var(--success); color: white; border-radius: 16px;">
                 <i class="fa-solid fa-play"></i> INICIAR TREINO
             </button>
+        <!-- TELA: Ranking dos Alunos (Leaderboard) -->
+        <section id="screen-leaderboard" class="screen hidden">
+            <div class="game-header" style="position:relative; margin-top:0.5rem;">
+                <button class="quit-btn" id="close-leaderboard" style="position:absolute; right:0; top:-5px; font-size:1.5rem; color:var(--text-light);"><i class="fa-solid fa-xmark"></i></button>
+                <h3 style="font-size: 1.8rem; margin-bottom: 2px;"><i class="fa-solid fa-trophy text-yellow"></i> Ranking dos Heróis</h3>
+                <p style="color:var(--gray-light); font-size:0.85rem; text-align: center;">Classificação dos alunos em tempo real!</p>
+            </div>
+
+            <!-- ABAS DO RANKING -->
+            <div class="leaderboard-tabs" style="display: flex; gap: 6px; justify-content: center; margin-top: 1rem; margin-bottom: 1rem; width: 100%;">
+                <button class="lb-tab-btn active" data-type="streak" style="background: var(--primary); color: var(--bg-dark); border: none; padding: 10px 8px; border-radius: 14px; font-weight: 900; font-size: 0.85rem; cursor: pointer; flex: 1; display: flex; align-items: center; justify-content: center; gap: 4px;"><i class="fa-solid fa-fire text-orange"></i> Ofensiva</button>
+                <button class="lb-tab-btn" data-type="phase" style="background: var(--gray-dark); color: white; border: none; padding: 10px 8px; border-radius: 14px; font-weight: 900; font-size: 0.85rem; cursor: pointer; flex: 1; display: flex; align-items: center; justify-content: center; gap: 4px;"><i class="fa-solid fa-medal text-secondary"></i> Fase Max</button>
+                <button class="lb-tab-btn" data-type="gems" style="background: var(--gray-dark); color: white; border: none; padding: 10px 8px; border-radius: 14px; font-weight: 900; font-size: 0.85rem; cursor: pointer; flex: 1; display: flex; align-items: center; justify-content: center; gap: 4px;"><i class="fa-solid fa-gem text-purple"></i> Gemas</button>
+            </div>
+
+            <!-- LISTA DE ALUNOS DO RANKING -->
+            <div id="leaderboard-list-container" style="display: flex; flex-direction: column; gap: 10px; overflow-y: auto; max-height: 380px; padding-right: 4px;">
+                <!-- Carregado via JS -->
+            </div>
         </section>
 
     </div>
