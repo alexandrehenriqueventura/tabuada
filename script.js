@@ -636,8 +636,8 @@ function openStudyView(num) {
 // MODO SELEÇÃO DE TREINO (CUSTOMIZADO)
 // ==========================================
 const screenCustomSelect = document.getElementById('screen-custom-select');
-let customSelectedOps = ['+', '-', '*', '/'];
-let customSelectedNums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+let customSelectedOps = [];
+let customSelectedNums = [];
 
 const btnOpenCustomPractice = document.getElementById('btn-open-custom-practice');
 if (btnOpenCustomPractice) {
@@ -699,13 +699,11 @@ function initCustomSelectScreen() {
                 sfx.click();
                 const num = parseInt(btn.dataset.num);
                 if (customSelectedNums.includes(num)) {
-                    if (customSelectedNums.length > 1) {
-                        customSelectedNums = customSelectedNums.filter(n => n !== num);
-                        btn.classList.remove('active');
-                        btn.style.opacity = '0.35';
-                        btn.style.border = '3px solid transparent';
-                        btn.style.background = 'var(--gray-dark)';
-                    }
+                    customSelectedNums = customSelectedNums.filter(n => n !== num);
+                    btn.classList.remove('active');
+                    btn.style.opacity = '0.35';
+                    btn.style.border = '3px solid transparent';
+                    btn.style.background = 'var(--gray-dark)';
                 } else {
                     customSelectedNums.push(num);
                     btn.classList.add('active');
@@ -728,13 +726,11 @@ document.querySelectorAll('.custom-op-btn').forEach(btn => {
         sfx.click();
         const op = btn.dataset.op;
         if (customSelectedOps.includes(op)) {
-            if (customSelectedOps.length > 1) {
-                customSelectedOps = customSelectedOps.filter(o => o !== op);
-                btn.classList.remove('active');
-                btn.style.opacity = '0.35';
-                btn.style.border = '3px solid transparent';
-                btn.style.transform = 'scale(0.95)';
-            }
+            customSelectedOps = customSelectedOps.filter(o => o !== op);
+            btn.classList.remove('active');
+            btn.style.opacity = '0.35';
+            btn.style.border = '3px solid transparent';
+            btn.style.transform = 'scale(0.95)';
         } else {
             customSelectedOps.push(op);
             btn.classList.add('active');
@@ -750,7 +746,7 @@ if (toggleAllBtn) {
     toggleAllBtn.addEventListener('click', () => {
         sfx.click();
         if (customSelectedNums.length === 10) {
-            customSelectedNums = [1];
+            customSelectedNums = [];
         } else {
             customSelectedNums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         }
@@ -771,11 +767,12 @@ function updateToggleAllBtn() {
 const btnStartCustomGame = document.getElementById('btn-start-custom-game');
 if (btnStartCustomGame) {
     btnStartCustomGame.addEventListener('click', () => {
-        sfx.click();
         if (customSelectedOps.length === 0 || customSelectedNums.length === 0) {
-            alert("Escolha pelo menos 1 operação e 1 número!");
+            sfx.wrong();
+            alert("Selecione pelo menos 1 operação e 1 número para começar o treino!");
             return;
         }
+        sfx.click();
         
         const customLevelData = {
             type: 'normal',
