@@ -38,19 +38,35 @@
             </div>
         </section>
 
-        <!-- TELA 0.5: Escolha do Animal -->
+        <!-- TELA 0.5: Escolha do Estilo Inicial do Herói -->
         <section id="screen-animal-select" class="screen hidden">
-            <div class="game-header">
-                <h3>Escolha seu Parceiro!</h3>
-                <p style="color:var(--gray-light); font-size:0.8rem;">Este animal será seu herói na jornada.</p>
+            <div class="game-header" style="text-align: center; margin-top: 1rem;">
+                <h3 style="font-size: 2rem; margin-bottom: 4px;">Crie seu Herói!</h3>
+                <p style="color:var(--gray-light); font-size:0.9rem;">Escolha o estilo inicial do seu aventureiro:</p>
             </div>
-            <div class="animal-grid" id="animal-selection-grid">
-                <div class="animal-option" data-icon="fa-dog"><i class="fa-solid fa-dog"></i></div>
-                <div class="animal-option" data-icon="fa-cat"><i class="fa-solid fa-cat"></i></div>
-                <div class="animal-option" data-icon="fa-frog"><i class="fa-solid fa-frog"></i></div>
-                <div class="animal-option" data-icon="fa-crow"><i class="fa-solid fa-crow"></i></div>
+            
+            <div class="hero-style-grid" id="hero-selection-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 1.5rem; width: 100%;">
+                <div class="hero-style-option selected" data-hero="boy" style="background: var(--bg-card); border: 3px solid white; border-radius: 20px; padding: 1.2rem 1rem; text-align: center; cursor: pointer; transition: transform 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;">
+                    <div style="font-size: 3rem; color: white;"><i class="fa-solid fa-child"></i></div>
+                    <span style="font-weight: 900; font-size: 1.1rem; color: white;">Menino</span>
+                </div>
+                <div class="hero-style-option" data-hero="girl" style="background: var(--bg-card); border: 3px solid transparent; border-radius: 20px; padding: 1.2rem 1rem; text-align: center; cursor: pointer; transition: transform 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;">
+                    <div style="font-size: 3rem; color: #f472b6;"><i class="fa-solid fa-child-dress"></i></div>
+                    <span style="font-weight: 900; font-size: 1.1rem; color: white;">Menina</span>
+                </div>
+                <div class="hero-style-option" data-hero="hero" style="background: var(--bg-card); border: 3px solid transparent; border-radius: 20px; padding: 1.2rem 1rem; text-align: center; cursor: pointer; transition: transform 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;">
+                    <div style="font-size: 3rem; color: var(--primary);"><i class="fa-solid fa-shield-halved"></i></div>
+                    <span style="font-weight: 900; font-size: 1.1rem; color: white;">Super-Herói</span>
+                </div>
+                <div class="hero-style-option" data-hero="wizard" style="background: var(--bg-card); border: 3px solid transparent; border-radius: 20px; padding: 1.2rem 1rem; text-align: center; cursor: pointer; transition: transform 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;">
+                    <div style="font-size: 3rem; color: var(--purple);"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                    <span style="font-weight: 900; font-size: 1.1rem; color: white;">Mago</span>
+                </div>
             </div>
-            <button class="primary-btn mt-2" id="btn-confirm-animal" style="margin-top: auto;">Pronto!</button>
+            
+            <button class="primary-btn" id="btn-confirm-animal" style="margin-top: auto; background: var(--success); color: white; border-radius: 16px;">
+                <i class="fa-solid fa-play"></i> COMEÇAR AVENTURA!
+            </button>
         </section>
 
         <!-- TELA 0.6: Hub de Operações -->
@@ -147,23 +163,23 @@
         <section id="screen-store" class="screen hidden">
             <div class="game-header" style="position:relative; margin-top:0.5rem;">
                 <button class="quit-btn" id="close-store" style="position:absolute; right:0; top:-5px; font-size:1.5rem; color:var(--text-light);"><i class="fa-solid fa-xmark"></i></button>
-                <h3 style="font-size: 1.8rem; margin-bottom: 2px;">Crie seu Herói!</h3>
-                <p style="color:var(--gray-light); font-size:0.85rem; text-align: center;">Use gemas para liberar roupas e acessórios</p>
+                <h3 style="font-size: 1.8rem; margin-bottom: 2px;">Armário do Herói</h3>
+                <p style="color:var(--gray-light); font-size:0.85rem; text-align: center;">Personalize seu visual e use gemas para desbloquear roupas</p>
             </div>
 
-            <!-- BOX DE PRÉ-VISUALIZAÇÃO DO BONECO -->
-            <div class="avatar-preview-box" style="display:flex; justify-content:center; align-items:center; background: rgba(0,0,0,0.25); border-radius: 20px; padding: 1rem; margin-top: 0.8rem; border: 2px dashed rgba(255,255,255,0.15);">
-                <div id="big-avatar-container" style="width: 130px; height: 130px; display: flex; justify-content: center; align-items: center;">
+            <!-- BOX DE PRÉ-VISUALIZAÇÃO DO BONECO (COM DEGRADÊ VIBRANTE QUE FAZ O PERSONAGEM SE DESTACAR) -->
+            <div class="avatar-preview-box" style="display:flex; justify-content:center; align-items:center; background: radial-gradient(circle at center, #0284c7 0%, #0f172a 85%); border-radius: 20px; padding: 1rem; margin-top: 0.8rem; border: 3px solid rgba(56, 189, 248, 0.4); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), inset 0 0 20px rgba(56, 189, 248, 0.3);">
+                <div id="big-avatar-container" style="width: 140px; height: 140px; display: flex; justify-content: center; align-items: center; filter: drop-shadow(0 6px 12px rgba(0,0,0,0.4));">
                     <!-- SVG do Boneco Gerado via JS -->
                 </div>
             </div>
 
             <!-- ABAS DA LOJA -->
             <div class="store-tabs" style="display: flex; gap: 6px; justify-content: center; margin-top: 1rem; margin-bottom: 0.8rem; width: 100%;">
-                <button class="store-tab-btn active" data-tab="skin" style="background: var(--primary); color: var(--bg-dark); border: none; padding: 8px 10px; border-radius: 12px; font-weight: 900; font-size: 0.8rem; cursor: pointer; flex: 1;"><i class="fa-solid fa-user"></i> Pele</button>
-                <button class="store-tab-btn" data-tab="hair" style="background: var(--gray-dark); color: white; border: none; padding: 8px 10px; border-radius: 12px; font-weight: 900; font-size: 0.8rem; cursor: pointer; flex: 1;"><i class="fa-solid fa-scissors"></i> Cabelo</button>
-                <button class="store-tab-btn" data-tab="clothing" style="background: var(--gray-dark); color: white; border: none; padding: 8px 10px; border-radius: 12px; font-weight: 900; font-size: 0.8rem; cursor: pointer; flex: 1;"><i class="fa-solid fa-shirt"></i> Roupa</button>
-                <button class="store-tab-btn" data-tab="accessory" style="background: var(--gray-dark); color: white; border: none; padding: 8px 10px; border-radius: 12px; font-weight: 900; font-size: 0.8rem; cursor: pointer; flex: 1;"><i class="fa-solid fa-glasses"></i> Extra</button>
+                <button class="store-tab-btn active" data-tab="skin" style="background: var(--primary); color: var(--bg-dark); border: none; padding: 10px 8px; border-radius: 14px; font-weight: 900; font-size: 0.85rem; cursor: pointer; flex: 1; display: flex; align-items: center; justify-content: center; gap: 4px;"><i class="fa-solid fa-user"></i> Pele</button>
+                <button class="store-tab-btn" data-tab="hair" style="background: var(--gray-dark); color: white; border: none; padding: 10px 8px; border-radius: 14px; font-weight: 900; font-size: 0.85rem; cursor: pointer; flex: 1; display: flex; align-items: center; justify-content: center; gap: 4px;"><i class="fa-solid fa-scissors"></i> Cabelos</button>
+                <button class="store-tab-btn" data-tab="clothing" style="background: var(--gray-dark); color: white; border: none; padding: 10px 8px; border-radius: 14px; font-weight: 900; font-size: 0.85rem; cursor: pointer; flex: 1; display: flex; align-items: center; justify-content: center; gap: 4px;"><i class="fa-solid fa-shirt"></i> Roupas</button>
+                <button class="store-tab-btn" data-tab="accessory" style="background: var(--gray-dark); color: white; border: none; padding: 10px 8px; border-radius: 14px; font-weight: 900; font-size: 0.85rem; cursor: pointer; flex: 1; display: flex; align-items: center; justify-content: center; gap: 4px;"><i class="fa-solid fa-glasses"></i> Extra</button>
             </div>
 
             <!-- ITENS DA LOJA -->

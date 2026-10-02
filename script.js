@@ -497,26 +497,38 @@ auth.onAuthStateChanged(async (user) => {
     }
 });
 
-// Seleção de Animal
-const animalOptions = document.querySelectorAll('.animal-option');
-animalOptions.forEach(opt => {
+// Seleção do Estilo do Herói (Primeiro Acesso)
+const heroStyleOptions = document.querySelectorAll('.hero-style-option');
+heroStyleOptions.forEach(opt => {
     opt.addEventListener('click', () => {
         sfx.click();
-        animalOptions.forEach(o => o.classList.remove('selected'));
+        heroStyleOptions.forEach(o => {
+            o.classList.remove('selected');
+            o.style.borderColor = 'transparent';
+        });
         opt.classList.add('selected');
+        opt.style.borderColor = 'white';
     });
 });
 
 document.getElementById('btn-confirm-animal').addEventListener('click', () => {
-    const selected = document.querySelector('.animal-option.selected');
+    const selected = document.querySelector('.hero-style-option.selected') || heroStyleOptions[0];
     if (selected) {
         sfx.click();
-        gameState.animalIcon = selected.dataset.icon;
+        const style = selected.dataset.hero;
+        if (style === 'boy') {
+            gameState.avatar = { skin: 'skin-1', hair: 'hair-short', clothing: 'shirt-basic', accessory: 'acc-none' };
+        } else if (style === 'girl') {
+            gameState.avatar = { skin: 'skin-1', hair: 'hair-long', clothing: 'shirt-basic', accessory: 'acc-bow' };
+        } else if (style === 'hero') {
+            gameState.avatar = { skin: 'skin-2', hair: 'hair-spiky-fire', clothing: 'shirt-hero', accessory: 'acc-none' };
+        } else if (style === 'wizard') {
+            gameState.avatar = { skin: 'skin-1', hair: 'hair-curly', clothing: 'shirt-wizard', accessory: 'acc-wizard-hat' };
+        }
+        
         saveProgress();
         applyAvatarSettings();
         startAssessment();
-    } else {
-        alert("Escolha um parceiro primeiro!");
     }
 });
 
@@ -1442,28 +1454,34 @@ function renderStore() {
         const div = document.createElement('div');
         div.className = `store-item ${isOwned ? 'owned' : ''} ${isEquipped ? 'equipped' : ''}`;
         div.style.background = 'var(--bg-card)';
-        div.style.padding = '12px';
+        div.style.padding = '14px 10px';
         div.style.borderRadius = '16px';
         div.style.textAlign = 'center';
         div.style.cursor = 'pointer';
-        div.style.border = isEquipped ? '3px solid white' : (isOwned ? '3px solid var(--gray-dark)' : '3px solid transparent');
-        div.style.opacity = (isOwned || isEquipped) ? '1' : '0.85';
+        div.style.display = 'flex';
+        div.style.flexDirection = 'column';
+        div.style.alignItems = 'center';
+        div.style.justifyContent = 'space-between';
+        div.style.minHeight = '105px';
+        div.style.boxShadow = '0 4px 10px rgba(0,0,0,0.25)';
+        div.style.border = isEquipped ? '3px solid white' : (isOwned ? '3px solid rgba(255,255,255,0.3)' : '3px solid transparent');
+        div.style.opacity = (isOwned || isEquipped) ? '1' : '0.9';
 
         let iconOrPreview = '';
         if (item.preview) {
-            iconOrPreview = `<div style="width:24px; height:24px; border-radius:50%; background:${item.preview}; margin:0 auto 6px auto; border:2px solid white;"></div>`;
+            iconOrPreview = `<div style="width:28px; height:28px; border-radius:50%; background:${item.preview}; margin:0 auto 4px auto; border:2px solid white; box-shadow:0 2px 5px rgba(0,0,0,0.3);"></div>`;
         } else {
-            iconOrPreview = `<i class="fa-solid ${item.icon || 'fa-star'}" style="font-size:1.5rem; margin-bottom:6px; display:block;"></i>`;
+            iconOrPreview = `<i class="fa-solid ${item.icon || 'fa-star'}" style="font-size:1.6rem; margin-bottom:4px; display:block; color:white;"></i>`;
         }
 
         let actionHtml = '';
-        if (isEquipped) actionHtml = `<p class="item-price" style="color:white; font-weight:900; margin-top:4px;"><i class="fa-solid fa-circle-check"></i> Equipado</p>`;
-        else if (isOwned) actionHtml = `<p class="item-price" style="color:var(--gray-light); font-weight:800; margin-top:4px;">No Armário</p>`;
-        else actionHtml = `<p class="item-price" style="color:var(--purple); font-weight:900; margin-top:4px;"><i class="fa-solid fa-gem"></i> ${item.price}</p>`;
+        if (isEquipped) actionHtml = `<p class="item-price" style="color:white; font-weight:900; font-size:0.8rem; margin-top:4px;"><i class="fa-solid fa-circle-check"></i> Equipado</p>`;
+        else if (isOwned) actionHtml = `<p class="item-price" style="color:rgba(255,255,255,0.8); font-weight:800; font-size:0.8rem; margin-top:4px;">No Armário</p>`;
+        else actionHtml = `<p class="item-price" style="color:var(--primary); font-weight:900; font-size:0.9rem; margin-top:4px;"><i class="fa-solid fa-gem"></i> ${item.price}</p>`;
         
         div.innerHTML = `
             ${iconOrPreview}
-            <h4 style="font-size:0.95rem; font-weight:900;">${item.name}</h4>
+            <h4 style="font-size:0.9rem; font-weight:900; color:white; line-height:1.2;">${item.name}</h4>
             ${actionHtml}
         `;
         
