@@ -1438,7 +1438,8 @@ btnStore.addEventListener('click', () => {
 
 closeStore.addEventListener('click', () => {
     sfx.click();
-    showScreen(screenMap);
+    renderMap();
+    showScreen(screenMap, true);
 });
 
 function renderStore() {
@@ -1521,8 +1522,8 @@ const btnBadges = document.getElementById('btn-badges');
 const closeBadges = document.getElementById('close-badges');
 const badgesContainer = document.getElementById('badges-container');
 
-btnBadges.addEventListener('click', () => { renderBadges(); showScreen(screenBadges); });
-closeBadges.addEventListener('click', () => { showScreen(screenMap); });
+btnBadges.addEventListener('click', () => { sfx.click(); renderBadges(); showScreen(screenBadges, false); });
+closeBadges.addEventListener('click', () => { sfx.click(); renderMap(); showScreen(screenMap, true); });
 
 function renderBadges() {
     badgesContainer.innerHTML = '';
