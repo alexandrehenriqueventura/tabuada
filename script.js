@@ -11,9 +11,19 @@ const screenStudySelect = document.getElementById('screen-study-select');
 const screenStudyView = document.getElementById('screen-study-view');
 const globalHeader = document.getElementById('global-header');
 
-// Elementos de Login
-const loginForm = document.getElementById('login-form');
-const usernameInput = document.getElementById('username-input');
+// Elementos de Login / Cadastro (Apelido + PIN)
+const tabLoginBtn = document.getElementById('tab-login-btn');
+const tabRegisterBtn = document.getElementById('tab-register-btn');
+const authForm = document.getElementById('auth-form');
+const authNicknameInput = document.getElementById('auth-nickname');
+const authPinInput = document.getElementById('auth-pin');
+const btnTogglePin = document.getElementById('btn-toggle-pin');
+const pinEyeIcon = document.getElementById('pin-eye-icon');
+const btnAuthSubmit = document.getElementById('btn-auth-submit');
+const btnAuthText = document.getElementById('btn-auth-text');
+const btnGuestLogin = document.getElementById('btn-guest-login');
+const authFeedback = document.getElementById('auth-feedback');
+const btnLogout = document.getElementById('btn-logout');
 
 // Elementos Globais
 const displayUsername = document.getElementById('display-username');
@@ -445,45 +455,228 @@ function showScreen(screenEl, showHeader = true) {
 }
 
 // ==========================================
-// LOGIN E NAVEGAÇÃO INICIAL
+// LOGIN E NAVEGAÇÃO INICIAL (APELIDO + PIN + CONVIDADO)
 // ==========================================
-const btnGoogleLogin = document.getElementById('btn-google-login');
-const loginLoadingMsg = document.getElementById('login-loading-msg');
+let authMode = 'login'; // 'login' ou 'register'
 
-btnGoogleLogin.addEventListener('click', async () => {
-    sfx.click();
-    const provider = new firebase.auth.GoogleAuthProvider();
-    btnGoogleLogin.disabled = true;
-    loginLoadingMsg.classList.remove('hidden');
-    
-    try {
-        await auth.signInWithPopup(provider);
-        // O restante será tratado pelo onAuthStateChanged abaixo
-    } catch(error) {
-        console.error("Erro no login com Google:", error);
-        alert("Ocorreu um erro ao fazer login. Tente novamente.");
-        btnGoogleLogin.disabled = false;
-        loginLoadingMsg.classList.add('hidden');
+function showAuthFeedback(msg, type = 'error') {
+    if (!authFeedback) return;
+    authFeedback.className = `auth-feedback-box ${type}`;
+    authFeedback.innerHTML = msg;
+    authFeedback.classList.remove('hidden');
+}
+
+function clearAuthFeedback() {
+    if (!authFeedback) return;
+    authFeedback.classList.add('hidden');
+    authFeedback.innerHTML = '';
+}
+
+// Alternar Abas (Já tenho conta vs Criar Herói)
+if (tabLoginBtn && tabRegisterBtn) {
+    tabLoginBtn.addEventListener('click', () => {
+        sfx.click();
+        authMode = 'login';
+        tabLoginBtn.classList.add('active');
+        tabRegisterBtn.classList.remove('active');
+        if (btnAuthText) btnAuthText.textContent = 'ENTRAR NA AVENTURA';
+        clearAuthFeedback();
+    });
+
+    tabRegisterBtn.addEventListener('click', () => {
+        sfx.click();
+        authMode = 'register';
+        tabRegisterBtn.classList.add('active');
+        tabLoginBtn.classList.remove('active');
+        if (btnAuthText) btnAuthText.textContent = 'CRIAR MEU HERÓI';
+        clearAuthFeedback();
+    });
+}
+
+// Alternar Mostrar/Ocultar PIN
+if (btnTogglePin && authPinInput && pinEyeIcon) {
+    btnTogglePin.addEventListener('click', () => {
+        const isPassword = authPinInput.type === 'password';
+        authPinInput.type = isPassword ? 'text' : 'password';
+        pinEyeIcon.className = isPassword ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye';
+    });
+}
+
+// Obter e validar credenciais dos inputs
+function getCredentialsFromInputs() {
+    if (!authNicknameInput || !authPinInput) return null;
+
+    const rawNick = authNicknameInput.value.trim();
+    const pin = authPinInput.value.trim();
+
+    if (!rawNick) {
+        showAuthFeedback('<i class="fa-solid fa-circle-exclamation"></i> Digite um apelido para o seu herói!', 'error');
+        authNicknameInput.focus();
+        return null;
     }
-});
 
+    // Normaliza para uso no email sintético (letras e números)
+    const cleanNick = rawNick.toLowerCase().replace(/[^a-z0-9_]/g, '');
+    if (cleanNick.length < 2) {
+        showAuthFeedback('<i class="fa-solid fa-circle-exclamation"></i> O apelido deve conter pelo menos 2 letras ou números!', 'error');
+        authNicknameInput.focus();
+        return null;
+    }
+
+    if (!pin || pin.length < 4) {
+        showAuthFeedback('<i class="fa-solid fa-circle-exclamation"></i> O PIN precisa ter pelo menos 4 números!', 'error');
+        authPinInput.focus();
+        return null;
+    }
+
+    if (!/^\d+$/.test(pin)) {
+        showAuthFeedback('<i class="fa-solid fa-circle-exclamation"></i> O PIN deve ser composto apenas de números!', 'error');
+        authPinInput.focus();
+        return null;
+    }
+
+    const syntheticEmail = `${cleanNick}@tabuada.local`;
+    const internalPassword = `${pin}_tabuada`;
+
+    return { rawNick, cleanNick, pin, syntheticEmail, internalPassword };
+}
+
+// Processar Envio (Login ou Cadastro)
+async function handleAuthSubmit() {
+    sfx.click();
+    const creds = getCredentialsFromInputs();
+    if (!creds) return;
+
+    if (btnAuthSubmit) btnAuthSubmit.disabled = true;
+    if (btnGuestLogin) btnGuestLogin.disabled = true;
+
+    if (authMode === 'register') {
+        showAuthFeedback('<i class="fa-solid fa-spinner fa-spin"></i> Criando seu herói...', 'loading');
+        try {
+            const userCredential = await auth.createUserWithEmailAndPassword(creds.syntheticEmail, creds.internalPassword);
+            if (userCredential && userCredential.user) {
+                await userCredential.user.updateProfile({ displayName: creds.rawNick });
+            }
+            isNewUser = true;
+            // O restante do carregamento será processado pelo onAuthStateChanged
+        } catch (error) {
+            console.error("Erro no cadastro:", error);
+            if (btnAuthSubmit) btnAuthSubmit.disabled = false;
+            if (btnGuestLogin) btnGuestLogin.disabled = false;
+
+            if (error.code === 'auth/email-already-in-use') {
+                showAuthFeedback('<i class="fa-solid fa-circle-exclamation"></i> Esse apelido já está em uso! Escolha outro ou clique em <b>"JÁ TENHO CONTA"</b>.', 'error');
+            } else {
+                showAuthFeedback('<i class="fa-solid fa-circle-exclamation"></i> Não foi possível criar a conta. Tente novamente.', 'error');
+            }
+        }
+    } else {
+        // Modo Login
+        showAuthFeedback('<i class="fa-solid fa-spinner fa-spin"></i> Conectando à aventura...', 'loading');
+        try {
+            await auth.signInWithEmailAndPassword(creds.syntheticEmail, creds.internalPassword);
+            // O restante será processado pelo onAuthStateChanged
+        } catch (error) {
+            console.error("Erro no login:", error);
+            if (btnAuthSubmit) btnAuthSubmit.disabled = false;
+            if (btnGuestLogin) btnGuestLogin.disabled = false;
+
+            if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential' || error.code === 'auth/invalid-login-credentials') {
+                showAuthFeedback('<i class="fa-solid fa-circle-exclamation"></i> Apelido ou PIN incorreto. Verifique e tente de novo!', 'error');
+            } else {
+                showAuthFeedback('<i class="fa-solid fa-circle-exclamation"></i> Erro ao conectar. Verifique sua conexão e tente novamente.', 'error');
+            }
+        }
+    }
+}
+
+if (btnAuthSubmit) {
+    btnAuthSubmit.addEventListener('click', handleAuthSubmit);
+}
+
+// Disparar envio ao apertar Enter nos inputs
+if (authNicknameInput) {
+    authNicknameInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            if (authPinInput && !authPinInput.value) {
+                authPinInput.focus();
+            } else {
+                handleAuthSubmit();
+            }
+        }
+    });
+}
+
+if (authPinInput) {
+    authPinInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handleAuthSubmit();
+        }
+    });
+}
+
+// Login como Convidado
+if (btnGuestLogin) {
+    btnGuestLogin.addEventListener('click', async () => {
+        sfx.click();
+        if (btnAuthSubmit) btnAuthSubmit.disabled = true;
+        btnGuestLogin.disabled = true;
+        showAuthFeedback('<i class="fa-solid fa-spinner fa-spin"></i> Entrando como Convidado...', 'loading');
+
+        try {
+            const userCredential = await auth.signInAnonymously();
+            if (userCredential && userCredential.user && !userCredential.user.displayName) {
+                await userCredential.user.updateProfile({ displayName: "Convidado" });
+            }
+        } catch (error) {
+            console.error("Erro no login anônimo:", error);
+            if (btnAuthSubmit) btnAuthSubmit.disabled = false;
+            btnGuestLogin.disabled = false;
+            showAuthFeedback('<i class="fa-solid fa-circle-exclamation"></i> Não foi possível entrar como convidado. Verifique a internet e tente de novo.', 'error');
+        }
+    });
+}
+
+// Botão de Logout no Cabeçalho
+if (btnLogout) {
+    btnLogout.addEventListener('click', async () => {
+        sfx.click();
+        const confirmLogout = confirm("Deseja sair da conta para trocar de herói?");
+        if (confirmLogout) {
+            try {
+                await auth.signOut();
+            } catch (err) {
+                console.error("Erro ao sair:", err);
+            }
+        }
+    });
+}
+
+// Observador de Estado de Autenticação (Firebase Auth)
 auth.onAuthStateChanged(async (user) => {
     if (user) {
-        // Usuário logado!
-        btnGoogleLogin.disabled = true;
-        loginLoadingMsg.classList.remove('hidden');
-        loginLoadingMsg.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Bem-vindo, ${user.displayName.split(' ')[0]}! Carregando...`;
+        // Usuário logado ou Convidado conectado!
+        if (btnAuthSubmit) btnAuthSubmit.disabled = true;
+        if (btnGuestLogin) btnGuestLogin.disabled = true;
 
         currentUser = user.uid;
-        currentDisplayName = user.displayName;
-        currentEmail = user.email;
+        currentDisplayName = user.displayName || (user.isAnonymous ? "Convidado" : "Herói");
+        currentEmail = user.email || "";
 
-        // Atualiza o display name da tela global
+        // Atualiza nome na interface global
         displayUsername.textContent = currentDisplayName.split(' ')[0];
+
+        showAuthFeedback(`<i class="fa-solid fa-spinner fa-spin"></i> Bem-vindo, ${displayUsername.textContent}! Carregando...`, 'loading');
 
         await loadProgress(currentUser);
         updateGlobalUI();
-        
+
+        clearAuthFeedback();
+        if (btnAuthSubmit) btnAuthSubmit.disabled = false;
+        if (btnGuestLogin) btnGuestLogin.disabled = false;
+
         if (isNewUser) {
             showScreen(screenAnimalSelect, false);
         } else {
@@ -491,8 +684,12 @@ auth.onAuthStateChanged(async (user) => {
         }
     } else {
         // Usuário deslogado
-        btnGoogleLogin.disabled = false;
-        loginLoadingMsg.classList.add('hidden');
+        currentUser = "";
+        currentDisplayName = "";
+        currentEmail = "";
+        if (btnAuthSubmit) btnAuthSubmit.disabled = false;
+        if (btnGuestLogin) btnGuestLogin.disabled = false;
+        clearAuthFeedback();
         showScreen(document.getElementById('screen-login'), false);
     }
 });

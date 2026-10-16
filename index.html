@@ -21,21 +21,61 @@
 </head>
 <body>
     <div id="app-container">
-        <!-- TELA 0: Login -->
+        <!-- TELA 0: Login / Cadastro com Apelido e PIN -->
         <section id="screen-login" class="screen active" style="justify-content: center;">
-            <div class="login-content" style="text-align: center;">
-                <i class="fa-solid fa-gamepad login-icon" style="font-size: 5rem; color: var(--primary); margin-bottom: 20px;"></i>
-                <h1 class="login-title" style="font-size: 2.5rem; margin-bottom: 10px;">Tabuada Adventure</h1>
-                <p class="login-subtitle" style="color: var(--gray-light); margin-bottom: 30px;">Aprenda brincando e salve seu progresso na nuvem!</p>
+            <div class="login-content" style="text-align: center; width: 100%; max-width: 360px; margin: 0 auto; padding: 10px;">
+                <i class="fa-solid fa-gamepad login-icon" style="font-size: 4.2rem; color: var(--primary); margin-bottom: 12px;"></i>
+                <h1 class="login-title" style="font-size: 2.2rem; margin-bottom: 4px; letter-spacing: -0.5px;">Tabuada Adventure</h1>
+                <p class="login-subtitle" style="color: var(--gray-light); font-size: 0.95rem; margin-bottom: 18px;">Aprenda brincando e salve seu herói!</p>
                 
-                <div id="login-form">
-                    <button id="btn-google-login" type="button" class="primary-btn" style="background-color: white; color: #333; display: flex; align-items: center; justify-content: center; gap: 12px; font-size: 1.2rem; padding: 15px 20px;">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" width="24" height="24" alt="Google Logo">
-                        Entrar com o Google
+                <!-- Abas: Entrar vs Criar Herói -->
+                <div class="auth-tabs">
+                    <button type="button" class="auth-tab-btn active" id="tab-login-btn">
+                        <i class="fa-solid fa-key"></i> JÁ TENHO CONTA
                     </button>
-                    <p id="login-loading-msg" class="hidden" style="margin-top: 15px; color: var(--primary); font-weight: bold;"><i class="fa-solid fa-spinner fa-spin"></i> Conectando...</p>
+                    <button type="button" class="auth-tab-btn" id="tab-register-btn">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> CRIAR HERÓI
+                    </button>
                 </div>
-                <div style="margin-top: 30px;">
+
+                <form id="auth-form" style="margin-top: 16px; width: 100%;" onsubmit="return false;">
+                    <!-- Campo Apelido -->
+                    <div class="auth-input-group">
+                        <label for="auth-nickname"><i class="fa-solid fa-user"></i> Apelido do Herói</label>
+                        <input type="text" id="auth-nickname" autocomplete="username" maxlength="20" placeholder="Ex: Pedro, Bia10..." required>
+                    </div>
+
+                    <!-- Campo PIN -->
+                    <div class="auth-input-group" style="margin-top: 12px;">
+                        <label for="auth-pin"><i class="fa-solid fa-lock"></i> PIN Secreto (4 números)</label>
+                        <div class="pin-input-wrapper">
+                            <input type="password" id="auth-pin" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="• • • •" required>
+                            <button type="button" id="btn-toggle-pin" class="btn-toggle-eye" title="Mostrar ou ocultar PIN" tabindex="-1">
+                                <i class="fa-solid fa-eye" id="pin-eye-icon"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Mensagem de Feedback / Erro / Sucesso -->
+                    <div id="auth-feedback" class="auth-feedback-box hidden"></div>
+
+                    <!-- Botão de Ação Principal -->
+                    <button id="btn-auth-submit" type="submit" class="primary-btn" style="width: 100%; margin-top: 14px; padding: 14px; font-size: 1.1rem; font-weight: 900; border-radius: 16px; background: var(--primary); color: var(--bg-dark); display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <i class="fa-solid fa-play"></i> <span id="btn-auth-text">ENTRAR NA AVENTURA</span>
+                    </button>
+
+                    <!-- Divisor -->
+                    <div class="auth-divider">
+                        <span>ou</span>
+                    </div>
+
+                    <!-- Botão Jogar como Convidado -->
+                    <button id="btn-guest-login" type="button" class="guest-btn">
+                        <i class="fa-solid fa-gamepad"></i> JOGAR COMO CONVIDADO
+                    </button>
+                </form>
+
+                <div style="margin-top: 22px;">
                     <a href="privacidade.html" target="_blank" style="color: var(--gray-light); font-size: 0.85rem; text-decoration: underline;">Política de Privacidade</a>
                 </div>
             </div>
@@ -126,6 +166,7 @@
                 <div class="stat"><i class="fa-solid fa-fire text-orange"></i> <span id="global-streak">0</span></div>
                 <div class="stat"><i class="fa-solid fa-bolt text-yellow"></i> <span id="global-lives">3</span></div>
                 <div class="stat"><i class="fa-solid fa-gem text-purple"></i> <span id="global-gems">0</span></div>
+                <div class="stat" id="btn-logout" style="cursor:pointer;" title="Sair / Trocar Herói"><i class="fa-solid fa-right-from-bracket text-red"></i></div>
             </div>
         </header>
 
